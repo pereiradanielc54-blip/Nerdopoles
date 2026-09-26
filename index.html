@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#0b0b22">
+  <meta name="theme-color" content="#05050b">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,60 +12,109 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <style>
-    :root{color-scheme:dark}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#080819}
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:none;user-select:none}
-    #app{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#080819}
-    .ambient{position:absolute;inset:-12%;background-position:center;background-size:cover;background-repeat:no-repeat;filter:blur(28px) brightness(.34) saturate(1.35);transform:scale(1.16)}
-    .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,3,16,.18),rgba(4,3,16,.36))}
-    .menu-shell{position:absolute;inset:0;display:grid;place-items:center;padding:max(env(safe-area-inset-top),8px) max(env(safe-area-inset-right),8px) max(env(safe-area-inset-bottom),8px) max(env(safe-area-inset-left),8px)}
-    .menu-art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;opacity:0;transition:opacity .18s ease;pointer-events:none;-webkit-user-drag:none;filter:drop-shadow(0 16px 28px rgba(0,0,0,.44))}
-    .menu-art.ready{opacity:1}
-    .loading{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;letter-spacing:.04em;color:#e7d8ff}
-    .loading.hidden{display:none}
-    .rotate-lock{display:none;position:absolute;inset:0;z-index:20;place-items:center;padding:28px;text-align:center;background:radial-gradient(circle at 50% 35%,#2a1660,#070716 66%)}
-    .rotate-card{max-width:420px;padding:24px 22px;border:1px solid rgba(200,167,255,.35);border-radius:24px;background:rgba(11,9,31,.9);box-shadow:0 18px 60px rgba(0,0,0,.48)}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#000}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      overscroll-behavior:none;
+      touch-action:manipulation;
+      user-select:none;
+    }
+    #app{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100dvh;
+      overflow:hidden;
+      background:#000;
+      display:grid;
+      place-items:center;
+    }
+    .menu-art{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:contain;
+      object-position:center;
+      image-rendering:auto;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+    .rotate-lock{
+      display:none;
+      position:absolute;
+      inset:0;
+      z-index:50;
+      place-items:center;
+      padding:28px;
+      text-align:center;
+      background:#080819;
+      color:#fff;
+    }
+    .rotate-card{
+      max-width:420px;
+      padding:24px 22px;
+      border:1px solid rgba(200,167,255,.35);
+      border-radius:24px;
+      background:#12102a;
+      box-shadow:0 18px 60px rgba(0,0,0,.55);
+    }
     .rotate-icon{font-size:52px;line-height:1;margin-bottom:14px}
     .rotate-title{margin:0 0 8px;font-size:22px;font-weight:800}
     .rotate-text{margin:0;opacity:.82;line-height:1.45}
-    @media (orientation:landscape) and (max-height:700px){.rotate-lock{display:grid}}
+    @media (orientation:portrait){
+      .rotate-lock{display:grid}
+    }
   </style>
 </head>
 <body>
-  <main id="app" aria-label="Menu inicial do Nerdópoles">
-    <div id="ambient" class="ambient" aria-hidden="true"></div>
-    <div class="shade" aria-hidden="true"></div>
-    <div id="loading" class="loading">NERDÓPOLES</div>
-    <section class="menu-shell">
-      <img id="menuArt" class="menu-art" alt="Menu oficial do Nerdópoles" draggable="false">
-    </section>
+  <main id="app" aria-label="Menu principal do Nerdópoles">
+    <img
+      class="menu-art"
+      src="/assets/nerdopoles-menu.jpg"
+      alt="Menu principal oficial do Nerdópoles"
+      width="1536"
+      height="864"
+      draggable="false"
+      fetchpriority="high"
+      decoding="sync"
+    >
     <section class="rotate-lock" aria-live="polite">
       <div class="rotate-card">
-        <div class="rotate-icon">📱</div>
-        <h1 class="rotate-title">Nerdópoles é jogado em modo retrato</h1>
-        <p class="rotate-text">Gire o celular para a posição vertical para continuar.</p>
+        <div class="rotate-icon">📱↔️</div>
+        <h1 class="rotate-title">Use o Nerdópoles em modo paisagem</h1>
+        <p class="rotate-text">Gire o celular para a posição horizontal para continuar.</p>
       </div>
     </section>
   </main>
+
   <script>
-    async function loadOfficialMenu(){
-      const response=await fetch('/assets/menu.b64',{cache:'force-cache'});
-      if(!response.ok) throw new Error('Não foi possível carregar a arte do menu.');
-      const base64=(await response.text()).trim();
-      const src='data:image/jpeg;base64,'+base64;
-      const image=document.getElementById('menuArt');
-      image.addEventListener('load',()=>{
-        image.classList.add('ready');
-        document.getElementById('ambient').style.backgroundImage='url("'+src+'")';
-        document.getElementById('loading').classList.add('hidden');
-      },{once:true});
-      image.src=src;
-    }
-    loadOfficialMenu().catch(()=>{document.getElementById('loading').textContent='NERDÓPOLES';});
-    if('serviceWorker' in navigator){
-      window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
-    }
+    (() => {
+      if (!('serviceWorker' in navigator)) return;
+
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading) return;
+        reloading = true;
+        location.reload();
+      });
+
+      window.addEventListener('load', async () => {
+        try {
+          const reg = await navigator.serviceWorker.register('/sw.js', {
+            updateViaCache: 'none'
+          });
+
+          await reg.update();
+
+          const checkUpdate = () => reg.update().catch(() => {});
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') checkUpdate();
+          });
+          window.addEventListener('focus', checkUpdate);
+        } catch (_) {}
+      });
+    })();
   </script>
 </body>
 </html>
