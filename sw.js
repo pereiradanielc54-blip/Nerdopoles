@@ -1,4 +1,4 @@
-const CACHE = 'nerdopoles-v0.2-landscape';
+const CACHE = 'nerdopoles-v0.3-immersive';
 const APP_SHELL = [
   '/manifest.webmanifest',
   '/icons/icon.svg',
