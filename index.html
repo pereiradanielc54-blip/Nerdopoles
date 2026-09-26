@@ -13,127 +13,240 @@
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <style>
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{
-      width:100%;
-      height:100%;
-      margin:0;
-      overflow:hidden;
-      background:#050008;
-    }
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#050008}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      overscroll-behavior:none;
-      touch-action:manipulation;
-      user-select:none;
+      overscroll-behavior:none;touch-action:manipulation;user-select:none
     }
     #app{
-      position:fixed;
-      inset:0;
-      width:100vw;
-      height:100dvh;
-      min-height:100svh;
-      overflow:hidden;
-      display:grid;
-      place-items:center;
+      position:fixed;inset:0;width:100vw;height:100dvh;min-height:100svh;
+      overflow:hidden;display:grid;place-items:center;
       background:
-        radial-gradient(ellipse at 0% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
-        radial-gradient(ellipse at 100% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
-        #050008;
+        radial-gradient(ellipse at 0% 50%,rgba(147,35,255,.62) 0%,rgba(99,16,185,.32) 24%,rgba(29,3,48,.16) 48%,transparent 68%),
+        radial-gradient(ellipse at 100% 50%,rgba(147,35,255,.62) 0%,rgba(99,16,185,.32) 24%,rgba(29,3,48,.16) 48%,transparent 68%),
+        #050008
     }
     .visual-stage{
-      position:absolute;
-      top:env(safe-area-inset-top,0px);
-      right:env(safe-area-inset-right,0px);
-      bottom:env(safe-area-inset-bottom,0px);
-      left:env(safe-area-inset-left,0px);
-      display:grid;
-      place-items:center;
-      overflow:hidden;
+      position:absolute;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);
+      bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);
+      display:grid;place-items:center;overflow:hidden
     }
-    .art-frame{
-      position:relative;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-    }
+    .art-frame{position:relative;width:100%;height:100%;overflow:hidden}
     .screen-art{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      display:block;
-      object-fit:contain;
-      object-position:center;
-      image-rendering:auto;
-      -webkit-user-drag:none;
-      pointer-events:none;
+      position:absolute;inset:0;width:100%;height:100%;display:block;
+      object-fit:contain;object-position:center;image-rendering:auto;
+      -webkit-user-drag:none;pointer-events:none
     }
-    .hotspot{
-      position:absolute;
-      z-index:10;
-      border:0;
-      padding:0;
-      margin:0;
-      background:transparent;
-      cursor:pointer;
-      touch-action:manipulation;
+    .hotspot,.choice,.arrow,.toggle,.bot-button{
+      position:absolute;z-index:12;border:0;padding:0;margin:0;cursor:pointer;
+      touch-action:manipulation;font:inherit
     }
-    .hotspot:focus-visible{
-      outline:3px solid rgba(255,255,255,.92);
-      outline-offset:2px;
-      border-radius:14px;
+    .hotspot,.choice,.arrow{background:transparent}
+    button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+
+    /* Menu */
+    #playHotspot{left:1.15%;top:18.75%;width:24%;height:11.9%}
+
+    /* Configuração */
+    #configUI{position:absolute;inset:0;z-index:11;display:none}
+    #configUI.active{display:block}
+
+    #backButton{left:1.05%;top:1.7%;width:11.2%;height:7.7%;border-radius:18px}
+
+    .difficulty{
+      left:2.05%;width:20.05%;height:10.0%;border-radius:18px;
+      background:rgba(5,4,22,.28);
+      transition:box-shadow .12s ease,background .12s ease,filter .12s ease
     }
-    #playHotspot{
-      left:1.15%;
-      top:18.75%;
-      width:24%;
-      height:11.9%;
+    .difficulty[data-i="0"]{top:28.45%}
+    .difficulty[data-i="1"]{top:39.55%}
+    .difficulty[data-i="2"]{top:50.65%}
+    .difficulty[data-i="3"]{top:61.60%}
+    .difficulty:not(.selected){background:rgba(3,2,18,.34);filter:saturate(.72) brightness(.84)}
+    .difficulty.selected{
+      background:rgba(255,255,255,.015);
+      box-shadow:inset 0 0 0 3px #f5c54d,0 0 18px rgba(255,190,44,.82),0 0 32px rgba(134,43,255,.42)
     }
+
+    .bot-button{
+      top:38.85%;width:3.18%;height:6.6%;border-radius:9px;
+      display:grid;place-items:center;
+      color:#fff;font-weight:900;font-size:clamp(12px,2.0vw,28px);
+      background:linear-gradient(180deg,rgba(39,63,116,.98),rgba(10,22,58,.99));
+      border:1px solid rgba(151,187,255,.75);
+      box-shadow:inset 0 0 10px rgba(105,150,255,.28),0 2px 8px rgba(0,0,0,.38)
+    }
+    .bot-button[data-v="1"]{left:24.00%}
+    .bot-button[data-v="2"]{left:27.48%}
+    .bot-button[data-v="3"]{left:30.96%}
+    .bot-button[data-v="4"]{left:34.44%}
+    .bot-button[data-v="5"]{left:37.92%}
+    .bot-button.selected{
+      color:#fff6ca;
+      background:linear-gradient(180deg,#d88a08,#6c3600);
+      border-color:#ffd968;
+      box-shadow:inset 0 0 10px rgba(255,243,148,.7),0 0 14px #ffb416
+    }
+    #playersSummary{
+      position:absolute;left:24.35%;top:47.55%;width:17.65%;height:7.25%;
+      z-index:15;display:grid;place-items:center;text-align:center;
+      padding:.15rem .4rem;border-radius:8px;
+      color:#f3f4ff;background:rgba(15,20,48,.96);
+      font-weight:700;font-size:clamp(7px,1.05vw,16px);line-height:1.25;
+      pointer-events:none
+    }
+
+    .map-arrow{top:63.35%;width:3.0%;height:8.6%;border-radius:10px}
+    #mapPrev{left:26.85%}
+    #mapNext{left:39.20%}
+    #changeMap{left:28.15%;top:80.75%;width:13.05%;height:6.55%;border-radius:9px}
+    #mapName{
+      position:absolute;left:29.75%;top:70.20%;width:9.8%;height:3.35%;
+      z-index:15;display:grid;place-items:center;
+      background:rgba(8,14,34,.88);color:#fff;font-weight:800;
+      font-size:clamp(7px,.95vw,14px);border-radius:5px;pointer-events:none
+    }
+
+    .piece{
+      width:8.85%;height:17.3%;border-radius:14px;
+      background:rgba(3,2,18,.28);
+      transition:box-shadow .12s ease,background .12s ease,filter .12s ease
+    }
+    .piece[data-i="0"]{left:44.35%;top:34.35%}
+    .piece[data-i="1"]{left:53.75%;top:34.35%}
+    .piece[data-i="2"]{left:63.05%;top:34.35%}
+    .piece[data-i="3"]{left:44.35%;top:52.55%}
+    .piece[data-i="4"]{left:53.75%;top:52.55%}
+    .piece[data-i="5"]{left:63.05%;top:52.55%}
+    .piece:not(.selected){background:rgba(3,2,18,.22);filter:saturate(.75) brightness(.88)}
+    .piece.selected{
+      background:rgba(255,255,255,.01);
+      box-shadow:inset 0 0 0 3px #ff4cff,0 0 17px #b000ff,0 0 31px rgba(255,0,245,.44)
+    }
+
+    .arrow{width:2.10%;height:4.55%;border-radius:9px}
+    .left-arrow{left:88.00%}
+    .right-arrow{left:96.10%}
+    .row-duration{top:29.75%}
+    .row-money{top:36.95%}
+    .row-build{top:44.05%}
+
+    .setting-value{
+      position:absolute;left:90.05%;width:6.05%;height:4.25%;
+      z-index:15;display:grid;place-items:center;text-align:center;
+      color:#fff;font-weight:800;background:rgba(17,18,50,.96);
+      font-size:clamp(7px,.95vw,14px);border-radius:7px;pointer-events:none
+    }
+    #durationValue{top:29.90%}
+    #moneyValue{top:37.10%}
+    #buildValue{top:44.20%}
+
+    .toggle{
+      left:94.05%;width:3.95%;height:4.05%;border-radius:999px;
+      background:linear-gradient(90deg,#7f00ff,#d000ff);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),0 0 12px rgba(183,0,255,.55)
+    }
+    .toggle::after{
+      content:"";position:absolute;top:10%;right:7%;width:40%;height:80%;
+      border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.45);
+      transition:left .14s ease,right .14s ease
+    }
+    .toggle.off{
+      background:linear-gradient(90deg,#252b40,#3a4055);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)
+    }
+    .toggle.off::after{right:53%}
+    #tradeToggle{top:52.80%}
+    #auctionToggle{top:60.55%}
+    #eventToggle{top:68.50%}
+
+    #startBlocker{
+      position:absolute;left:43.15%;top:78.25%;width:31.5%;height:16.0%;
+      z-index:13;background:transparent;cursor:default
+    }
+
+    #toast{
+      position:absolute;left:50%;bottom:2.2%;transform:translate(-50%,16px);
+      z-index:30;max-width:72%;padding:.42rem .8rem;border-radius:999px;
+      background:rgba(7,8,28,.94);border:1px solid rgba(190,123,255,.7);
+      color:#fff;font-weight:700;font-size:clamp(8px,1vw,14px);
+      opacity:0;pointer-events:none;transition:opacity .16s ease,transform .16s ease;
+      box-shadow:0 8px 24px rgba(0,0,0,.38)
+    }
+    #toast.show{opacity:1;transform:translate(-50%,0)}
+
     .rotate-lock{
-      display:none;
-      position:absolute;
-      inset:0;
-      z-index:50;
-      place-items:center;
-      padding:28px;
-      text-align:center;
-      background:
-        radial-gradient(circle at 50% 36%, rgba(116,36,212,.34), transparent 44%),
-        #080819;
-      color:#fff;
+      display:none;position:absolute;inset:0;z-index:50;place-items:center;
+      padding:28px;text-align:center;
+      background:radial-gradient(circle at 50% 36%,rgba(116,36,212,.34),transparent 44%),#080819;
+      color:#fff
     }
     .rotate-card{
-      max-width:420px;
-      padding:24px 22px;
-      border:1px solid rgba(200,167,255,.35);
-      border-radius:24px;
-      background:#12102a;
-      box-shadow:0 18px 60px rgba(0,0,0,.55);
+      max-width:420px;padding:24px 22px;border:1px solid rgba(200,167,255,.35);
+      border-radius:24px;background:#12102a;box-shadow:0 18px 60px rgba(0,0,0,.55)
     }
     .rotate-icon{font-size:52px;line-height:1;margin-bottom:14px}
     .rotate-title{margin:0 0 8px;font-size:22px;font-weight:800}
     .rotate-text{margin:0;opacity:.82;line-height:1.45}
-    @media (orientation:portrait){
-      .rotate-lock{display:grid}
-    }
+    @media (orientation:portrait){.rotate-lock{display:grid}}
   </style>
 </head>
 <body>
   <main id="app" aria-label="Nerdópoles">
     <section id="visualStage" class="visual-stage" aria-label="Tela do jogo">
       <div id="artFrame" class="art-frame">
-        <img
-          id="screenArt"
-          class="screen-art"
-          src="/assets/nerdopoles-menu.jpg"
-          alt="Menu principal oficial do Nerdópoles"
-          width="1536"
-          height="864"
-          draggable="false"
-          fetchpriority="high"
-          decoding="sync"
-        >
+        <img id="screenArt" class="screen-art" src="/assets/nerdopoles-menu.jpg"
+          alt="Menu principal oficial do Nerdópoles" width="1536" height="864"
+          draggable="false" fetchpriority="high" decoding="sync">
+
         <button id="playHotspot" class="hotspot" type="button" aria-label="Jogar"></button>
+
+        <div id="configUI" aria-label="Configuração da partida">
+          <button id="backButton" class="hotspot" type="button" aria-label="Voltar ao menu"></button>
+
+          <button class="choice difficulty" data-i="0" type="button" aria-label="Dificuldade fácil"></button>
+          <button class="choice difficulty" data-i="1" type="button" aria-label="Dificuldade normal"></button>
+          <button class="choice difficulty" data-i="2" type="button" aria-label="Dificuldade difícil"></button>
+          <button class="choice difficulty" data-i="3" type="button" aria-label="Dificuldade lendário"></button>
+
+          <button class="bot-button" data-v="1" type="button">1</button>
+          <button class="bot-button" data-v="2" type="button">2</button>
+          <button class="bot-button" data-v="3" type="button">3</button>
+          <button class="bot-button" data-v="4" type="button">4</button>
+          <button class="bot-button" data-v="5" type="button">5</button>
+          <div id="playersSummary"></div>
+
+          <button id="mapPrev" class="hotspot map-arrow" type="button" aria-label="Mapa anterior"></button>
+          <button id="mapNext" class="hotspot map-arrow" type="button" aria-label="Próximo mapa"></button>
+          <button id="changeMap" class="hotspot" type="button" aria-label="Alterar mapa"></button>
+          <div id="mapName"></div>
+
+          <button class="choice piece" data-i="0" type="button" aria-label="Peça Nyan"></button>
+          <button class="choice piece" data-i="1" type="button" aria-label="Peça Chapéu Mágico"></button>
+          <button class="choice piece" data-i="2" type="button" aria-label="Peça Baú"></button>
+          <button class="choice piece" data-i="3" type="button" aria-label="Peça Espada"></button>
+          <button class="choice piece" data-i="4" type="button" aria-label="Peça Escudo Nerdora"></button>
+          <button class="choice piece" data-i="5" type="button" aria-label="Peça Dirigível"></button>
+
+          <button id="durationPrev" class="arrow left-arrow row-duration" type="button" aria-label="Duração anterior"></button>
+          <button id="durationNext" class="arrow right-arrow row-duration" type="button" aria-label="Próxima duração"></button>
+          <div id="durationValue" class="setting-value"></div>
+
+          <button id="moneyPrev" class="arrow left-arrow row-money" type="button" aria-label="Dinheiro inicial anterior"></button>
+          <button id="moneyNext" class="arrow right-arrow row-money" type="button" aria-label="Próximo dinheiro inicial"></button>
+          <div id="moneyValue" class="setting-value"></div>
+
+          <button id="buildPrev" class="arrow left-arrow row-build" type="button" aria-label="Regra de construção anterior"></button>
+          <button id="buildNext" class="arrow right-arrow row-build" type="button" aria-label="Próxima regra de construção"></button>
+          <div id="buildValue" class="setting-value"></div>
+
+          <button id="tradeToggle" class="toggle" type="button" aria-label="Permitir trocas"></button>
+          <button id="auctionToggle" class="toggle" type="button" aria-label="Leilões"></button>
+          <button id="eventToggle" class="toggle" type="button" aria-label="Cartas de evento"></button>
+
+          <div id="startBlocker" aria-hidden="true"></div>
+          <div id="toast" role="status" aria-live="polite"></div>
+        </div>
       </div>
     </section>
 
@@ -147,125 +260,183 @@
   </main>
 
   <script>
-    (() => {
-      const MENU_SRC = '/assets/nerdopoles-menu.jpg';
-      const CONFIG_SRC = '/assets/nerdopoles-config.jpg';
+  (() => {
+    const MENU_SRC='/assets/nerdopoles-menu.jpg';
+    const CONFIG_SRC='/assets/nerdopoles-config.jpg';
 
-      const stage = document.getElementById('visualStage');
-      const frame = document.getElementById('artFrame');
-      const screenArt = document.getElementById('screenArt');
-      const playHotspot = document.getElementById('playHotspot');
+    const defaults={
+      difficulty:0,bots:3,piece:0,map:0,duration:1,money:1,build:1,
+      trades:true,auctions:true,events:true
+    };
+    const difficulties=['Fácil','Normal','Difícil','Lendário'];
+    const pieces=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
+    const maps=['Cidade de Nerdora','Reino Celeste','Distrito Arcano'];
+    const durations=['Rápida','Clássica','Longa'];
+    const money=['1.000','1.500','2.000'];
+    const builds=['Rápida','Padrão','Estratégica'];
 
-      const fitArtwork = () => {
-        const w = stage.clientWidth;
-        const h = stage.clientHeight;
-        if (!w || !h) return;
+    let state={...defaults};
+    try{
+      const saved=JSON.parse(localStorage.getItem('nerdopoles-match-config')||'null');
+      if(saved && typeof saved==='object') state={...defaults,...saved};
+    }catch(_){}
 
-        const ratio = 16 / 9;
-        let fw = w;
-        let fh = fw / ratio;
+    const stage=document.getElementById('visualStage');
+    const frame=document.getElementById('artFrame');
+    const screenArt=document.getElementById('screenArt');
+    const playHotspot=document.getElementById('playHotspot');
+    const configUI=document.getElementById('configUI');
+    const toast=document.getElementById('toast');
+    let toastTimer=null;
 
-        if (fh > h) {
-          fh = h;
-          fw = fh * ratio;
-        }
+    const fitArtwork=()=>{
+      const w=stage.clientWidth,h=stage.clientHeight;
+      if(!w||!h)return;
+      const ratio=16/9;
+      let fw=w,fh=fw/ratio;
+      if(fh>h){fh=h;fw=fh*ratio}
+      frame.style.width=fw+'px';
+      frame.style.height=fh+'px';
+    };
 
-        frame.style.width = fw + 'px';
-        frame.style.height = fh + 'px';
-      };
+    const persist=()=>{
+      try{localStorage.setItem('nerdopoles-match-config',JSON.stringify(state))}catch(_){}
+    };
 
-      const showScreen = (screen, pushHistory = false) => {
-        const isConfig = screen === 'config';
+    const say=(message)=>{
+      toast.textContent=message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>toast.classList.remove('show'),1000);
+    };
 
-        screenArt.src = isConfig ? CONFIG_SRC : MENU_SRC;
-        screenArt.alt = isConfig
-          ? 'Tela oficial de configuração da partida do Nerdópoles'
-          : 'Menu principal oficial do Nerdópoles';
+    const cycle=(key,list,delta)=>{
+      state[key]=(state[key]+delta+list.length)%list.length;
+      persist();renderConfig();
+    };
 
-        playHotspot.hidden = isConfig;
+    const renderConfig=()=>{
+      document.querySelectorAll('.difficulty').forEach((el,i)=>el.classList.toggle('selected',i===state.difficulty));
+      document.querySelectorAll('.bot-button').forEach(el=>el.classList.toggle('selected',Number(el.dataset.v)===state.bots));
+      document.querySelectorAll('.piece').forEach((el,i)=>el.classList.toggle('selected',i===state.piece));
 
-        if (pushHistory) {
-          history.pushState(
-            { screen: isConfig ? 'config' : 'menu' },
-            '',
-            isConfig ? '#configuracao' : location.pathname
-          );
-        }
-      };
+      document.getElementById('playersSummary').innerHTML=
+        'Total de jogadores na partida: '+(state.bots+1)+'<br>(Você + '+state.bots+' '+(state.bots===1?'BOT':'BOTS')+')';
 
-      const configPreload = new Image();
-      configPreload.src = CONFIG_SRC;
+      document.getElementById('mapName').textContent=maps[state.map];
+      document.getElementById('durationValue').textContent=durations[state.duration];
+      document.getElementById('moneyValue').textContent=money[state.money];
+      document.getElementById('buildValue').textContent=builds[state.build];
 
-      playHotspot.addEventListener('click', () => {
-        showScreen('config', true);
+      document.getElementById('tradeToggle').classList.toggle('off',!state.trades);
+      document.getElementById('auctionToggle').classList.toggle('off',!state.auctions);
+      document.getElementById('eventToggle').classList.toggle('off',!state.events);
+
+      document.getElementById('tradeToggle').setAttribute('aria-pressed',String(state.trades));
+      document.getElementById('auctionToggle').setAttribute('aria-pressed',String(state.auctions));
+      document.getElementById('eventToggle').setAttribute('aria-pressed',String(state.events));
+    };
+
+    const showScreen=(screen,pushHistory=false)=>{
+      const isConfig=screen==='config';
+      screenArt.src=isConfig?CONFIG_SRC:MENU_SRC;
+      screenArt.alt=isConfig?'Tela oficial de configuração da partida do Nerdópoles':'Menu principal oficial do Nerdópoles';
+      playHotspot.hidden=isConfig;
+      configUI.classList.toggle('active',isConfig);
+      if(isConfig)renderConfig();
+
+      if(pushHistory){
+        history.pushState({screen:isConfig?'config':'menu'},'',isConfig?'#configuracao':location.pathname);
+      }
+    };
+
+    const configPreload=new Image();
+    configPreload.src=CONFIG_SRC;
+
+    playHotspot.addEventListener('click',()=>showScreen('config',true));
+    document.getElementById('backButton').addEventListener('click',()=>{
+      if(location.hash==='#configuracao') history.back();
+      else showScreen('menu');
+    });
+
+    document.querySelectorAll('.difficulty').forEach((el,i)=>{
+      el.addEventListener('click',()=>{
+        state.difficulty=i;persist();renderConfig();say('Dificuldade: '+difficulties[i]);
       });
+    });
 
-      window.addEventListener('popstate', () => {
-        showScreen(location.hash === '#configuracao' ? 'config' : 'menu');
+    document.querySelectorAll('.bot-button').forEach(el=>{
+      el.addEventListener('click',()=>{
+        state.bots=Number(el.dataset.v);persist();renderConfig();
+        say(state.bots+' '+(state.bots===1?'bot':'bots')+' na partida');
       });
+    });
 
-      window.addEventListener('resize', fitArtwork);
-      window.addEventListener('orientationchange', fitArtwork);
-      if ('ResizeObserver' in window) new ResizeObserver(fitArtwork).observe(stage);
+    document.querySelectorAll('.piece').forEach((el,i)=>{
+      el.addEventListener('click',()=>{
+        state.piece=i;persist();renderConfig();say('Peça: '+pieces[i]);
+      });
+    });
+
+    document.getElementById('mapPrev').addEventListener('click',()=>{cycle('map',maps,-1);say('Mapa: '+maps[state.map])});
+    document.getElementById('mapNext').addEventListener('click',()=>{cycle('map',maps,1);say('Mapa: '+maps[state.map])});
+    document.getElementById('changeMap').addEventListener('click',()=>{cycle('map',maps,1);say('Mapa: '+maps[state.map])});
+
+    document.getElementById('durationPrev').addEventListener('click',()=>{cycle('duration',durations,-1);say('Duração: '+durations[state.duration])});
+    document.getElementById('durationNext').addEventListener('click',()=>{cycle('duration',durations,1);say('Duração: '+durations[state.duration])});
+    document.getElementById('moneyPrev').addEventListener('click',()=>{cycle('money',money,-1);say('Dinheiro inicial: '+money[state.money]+' Nerdocoins')});
+    document.getElementById('moneyNext').addEventListener('click',()=>{cycle('money',money,1);say('Dinheiro inicial: '+money[state.money]+' Nerdocoins')});
+    document.getElementById('buildPrev').addEventListener('click',()=>{cycle('build',builds,-1);say('Construção: '+builds[state.build])});
+    document.getElementById('buildNext').addEventListener('click',()=>{cycle('build',builds,1);say('Construção: '+builds[state.build])});
+
+    const toggle=(key,id,label)=>{
+      state[key]=!state[key];persist();renderConfig();say(label+': '+(state[key]?'ativado':'desativado'));
+    };
+    document.getElementById('tradeToggle').addEventListener('click',()=>toggle('trades','tradeToggle','Trocas'));
+    document.getElementById('auctionToggle').addEventListener('click',()=>toggle('auctions','auctionToggle','Leilões'));
+    document.getElementById('eventToggle').addEventListener('click',()=>toggle('events','eventToggle','Cartas de evento'));
+
+    window.addEventListener('popstate',()=>showScreen(location.hash==='#configuracao'?'config':'menu'));
+    window.addEventListener('resize',fitArtwork);
+    window.addEventListener('orientationchange',fitArtwork);
+    if('ResizeObserver'in window)new ResizeObserver(fitArtwork).observe(stage);
+    fitArtwork();
+    showScreen(location.hash==='#configuracao'?'config':'menu');
+
+    const tryImmersive=async()=>{
+      try{if(screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(_){}
+      try{
+        if(!document.fullscreenElement&&document.documentElement.requestFullscreen){
+          await document.documentElement.requestFullscreen({navigationUI:'hide'});
+        }
+      }catch(_){}
+    };
+
+    window.addEventListener('pageshow',()=>{
       fitArtwork();
+      if(window.matchMedia('(display-mode: fullscreen)').matches)tryImmersive();
+    });
+    document.addEventListener('pointerdown',tryImmersive,{once:true,passive:true});
+    document.addEventListener('touchstart',tryImmersive,{once:true,passive:true});
 
-      showScreen(location.hash === '#configuracao' ? 'config' : 'menu');
-
-      const tryImmersive = async () => {
-        try {
-          if (screen.orientation?.lock) await screen.orientation.lock('landscape');
-        } catch (_) {}
-
-        try {
-          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
-          }
-        } catch (_) {}
-      };
-
-      window.addEventListener('pageshow', () => {
-        fitArtwork();
-        if (window.matchMedia('(display-mode: fullscreen)').matches) {
-          tryImmersive();
-        }
-      });
-
-      document.addEventListener('pointerdown', tryImmersive, { once:true, passive:true });
-      document.addEventListener('touchstart', tryImmersive, { once:true, passive:true });
-
-      if (!('serviceWorker' in navigator)) return;
-
-      let reloading = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (reloading) return;
-        reloading = true;
-        location.reload();
-      });
-
-      window.addEventListener('load', async () => {
-        try {
-          const reg = await navigator.serviceWorker.register('/sw.js', {
-            updateViaCache: 'none'
-          });
-
-          await reg.update();
-
-          const checkUpdate = () => reg.update().catch(() => {});
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-              checkUpdate();
-              fitArtwork();
-              tryImmersive();
-            }
-          });
-          window.addEventListener('focus', () => {
-            checkUpdate();
-            fitArtwork();
-            tryImmersive();
-          });
-        } catch (_) {}
-      });
-    })();
+    if(!('serviceWorker'in navigator))return;
+    let reloading=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloading)return;
+      reloading=true;location.reload();
+    });
+    window.addEventListener('load',async()=>{
+      try{
+        const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+        await reg.update();
+        const checkUpdate=()=>reg.update().catch(()=>{});
+        document.addEventListener('visibilitychange',()=>{
+          if(document.visibilityState==='visible'){checkUpdate();fitArtwork();tryImmersive()}
+        });
+        window.addEventListener('focus',()=>{checkUpdate();fitArtwork();tryImmersive()});
+      }catch(_){}
+    });
+  })();
   </script>
 </body>
 </html>
