@@ -1,0 +1,78 @@
+
+#ngBoard{position:absolute;inset:0;z-index:30;display:none;pointer-events:none;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#ngBoard.on{display:block}
+#ngSlots,#ngTokens,#ngOwners{position:absolute;inset:0;pointer-events:none}
+.ng-slot{position:absolute;width:1px;height:1px}
+.ng-token{position:absolute;transform:translate(-50%,-50%);width:clamp(26px,3.2vw,50px);height:clamp(28px,3.4vw,54px);display:grid;place-items:center;transition:left .26s cubic-bezier(.2,.75,.2,1),top .26s cubic-bezier(.2,.75,.2,1),transform .16s ease;z-index:6;filter:drop-shadow(0 5px 5px #000b)}
+.ng-token.me{z-index:8;transform:translate(-50%,-50%) scale(1.12)}
+.ng-token img{width:100%;height:100%;object-fit:contain;display:block}
+.ng-token .fallback{width:78%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#fff 0 10%,var(--c) 18% 64%,#150927 100%);border:2px solid #fff;font-size:clamp(12px,1.5vw,22px)}
+.ng-owner-flag{position:absolute;transform:translate(-50%,-50%);width:clamp(8px,.8vw,12px);height:clamp(11px,1.05vw,16px);background:var(--c);clip-path:polygon(0 0,100% 16%,70% 48%,100% 80%,0 100%);border-radius:2px;filter:drop-shadow(0 2px 2px #000a);z-index:2}
+.ng-buildings{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:flex-end;gap:1px;z-index:4;filter:drop-shadow(0 2px 2px #000a)}
+.ng-house-mini{position:relative;width:clamp(8px,.72vw,12px);height:clamp(7px,.64vw,10px);background:var(--owner);border:1px solid rgba(255,255,255,.8);border-radius:1px}
+.ng-house-mini:before{content:"";position:absolute;left:-18%;top:-55%;width:136%;height:68%;background:var(--owner);clip-path:polygon(50% 0,100% 100%,0 100%);filter:brightness(1.18)}
+.ng-hotel-mini{position:relative;width:clamp(16px,1.3vw,21px);height:clamp(9px,.78vw,13px);background:var(--owner);border:1px solid #fff;border-radius:2px}
+.ng-hotel-mini:before{content:"";position:absolute;left:-8%;top:-48%;width:116%;height:58%;background:var(--owner);clip-path:polygon(14% 100%,14% 40%,38% 40%,38% 0,63% 0,63% 40%,86% 40%,86% 100%);filter:brightness(1.2)}
+
+#ngHud{position:absolute;left:25%;top:24.5%;width:50%;height:46.5%;pointer-events:auto;border-radius:22px;background:linear-gradient(180deg,rgba(22,13,48,.91),rgba(6,11,32,.92));border:1px solid rgba(225,181,255,.56);box-shadow:0 18px 48px #000b,inset 0 0 42px rgba(119,38,207,.17);overflow:hidden}
+#ngHud:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0,rgba(190,77,255,.24),transparent 38%),linear-gradient(90deg,transparent 0 8%,rgba(255,255,255,.025) 8% 9%,transparent 9% 91%,rgba(255,255,255,.025) 91% 92%,transparent 92%);pointer-events:none}
+.ng-crystal{position:absolute;top:-7px;width:18px;height:18px;background:linear-gradient(135deg,#50e5ff,#9e45ff 52%,#ff83e7);transform:rotate(45deg);box-shadow:0 0 14px #6ae1ff,0 0 22px #a63cff;z-index:2}
+.ng-crystal.left{left:16%}.ng-crystal.right{right:16%}
+.ng-hud-head{position:relative;height:23%;display:grid;grid-template-columns:28% 44% 28%;align-items:center;padding:1.7% 2.2%;gap:1.5%;border-bottom:1px solid rgba(180,138,255,.18);background:linear-gradient(180deg,rgba(34,21,70,.82),rgba(15,18,50,.42))}
+.ng-panel{border-radius:13px;background:linear-gradient(180deg,rgba(25,28,67,.91),rgba(10,14,39,.9));border:1px solid rgba(116,113,179,.5);box-shadow:inset 0 0 16px rgba(101,64,190,.11)}
+.ng-turn-box{height:74%;padding:5%;display:flex;flex-direction:column;justify-content:center}
+.ng-turn{font-size:clamp(8px,.92vw,14px);font-weight:950;color:#ffe46e;text-shadow:0 0 8px rgba(255,222,86,.35)}
+.ng-sub{font-size:clamp(5.5px,.61vw,9px);color:#c9d1ff;margin-top:2px}
+.ng-wallet{height:74%;padding:5%;display:flex;flex-direction:column;justify-content:center;align-items:flex-end}
+.ng-cash{font-size:clamp(9px,1.02vw,16px);font-weight:950;color:#79ffc1;text-shadow:0 0 9px rgba(86,255,181,.25)}
+.ng-dice-altar{height:100%;display:flex;align-items:center;justify-content:center;gap:5%;position:relative}
+.ng-die{width:clamp(32px,3.45vw,54px);aspect-ratio:1;border-radius:13px;background:linear-gradient(145deg,#fff,#dcdceb);color:#2b0b48;display:grid;place-items:center;font-size:clamp(19px,2.25vw,35px);font-weight:1000;box-shadow:0 6px 12px #0009,inset 0 0 0 2px #fff;transform-style:preserve-3d}
+.ng-die.rolling{animation:ngDiceShake .42s linear infinite}
+@keyframes ngDiceShake{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-7px) rotate(18deg)}50%{transform:translateY(2px) rotate(-14deg)}75%{transform:translateY(-4px) rotate(10deg)}100%{transform:translateY(0) rotate(0)}}
+.ng-roll{height:55%;padding:0 7%;border-radius:12px;border:1px solid #ffd66b;background:linear-gradient(180deg,#c03cff,#6610b7);color:#fff;font-weight:950;font-size:clamp(7px,.78vw,12px);cursor:pointer;box-shadow:0 0 15px rgba(188,64,255,.42),inset 0 0 0 1px rgba(255,255,255,.14)}
+.ng-roll:not(:disabled):hover{filter:brightness(1.12);transform:translateY(-1px)}
+.ng-roll:disabled,.ng-btn:disabled{opacity:.34;cursor:default;filter:grayscale(.25)}
+.ng-hud-body{position:relative;height:77%;display:grid;grid-template-columns:24% 49% 27%;gap:1.5%;padding:1.8% 2.2% 2.2%}
+.ng-players{padding:4%;overflow:hidden}
+.ng-title{font-size:clamp(6.5px,.7vw,10.5px);font-weight:950;color:#dbcaff;margin-bottom:4%;letter-spacing:.04em}
+.ng-player{display:grid;grid-template-columns:auto 1fr auto;gap:5%;padding:3.2%;border-radius:9px;background:rgba(24,28,69,.92);margin-bottom:3%;font-size:clamp(5.5px,.61vw,9.2px);align-items:center;border:1px solid transparent}
+.ng-player.active{border-color:#ffd45e;box-shadow:0 0 10px rgba(255,205,79,.18)}
+.ng-player.dead{opacity:.38;text-decoration:line-through}
+.ng-player-color{width:clamp(7px,.68vw,10px);aspect-ratio:1;border-radius:50%;background:var(--pc);box-shadow:0 0 6px var(--pc)}
+.ng-pmoney{color:#80ffc0;font-weight:850}
+.ng-center{display:grid;grid-template-rows:38% 1fr;gap:4%}
+.ng-location{padding:4%;position:relative;overflow:hidden}
+.ng-location:before{content:"";position:absolute;right:-12%;top:-25%;width:44%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(159,72,255,.19),transparent 64%)}
+.ng-space{font-size:clamp(8px,.92vw,14px);font-weight:950;color:#fff}
+.ng-space-desc{font-size:clamp(5.8px,.64vw,9.5px);color:#cbd3ff;line-height:1.25;margin-top:3%}
+.ng-turn-tip{margin-top:4%;padding:2.4% 3%;border-radius:8px;background:rgba(85,40,140,.28);border-left:3px solid #b76cff;color:#ebdcff;font-size:clamp(5.5px,.61vw,9px)}
+.ng-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:4%}
+.ng-btn{border-radius:11px;border:1px solid #665d9c;background:linear-gradient(180deg,#27215f,#11143a);color:#fff;font-size:clamp(5.2px,.58vw,8.8px);font-weight:900;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.ng-btn:not(:disabled):hover{filter:brightness(1.12)}
+.ng-btn.gold{background:linear-gradient(180deg,#bd7a18,#653506);border-color:#ffd164}
+.ng-btn.purple{background:linear-gradient(180deg,#8d2ce8,#4e0a98);border-color:#ce7dff}
+.ng-right{display:grid;grid-template-rows:32% 1fr;gap:4%}
+.ng-decks{display:grid;grid-template-columns:1fr 1fr;gap:5%}
+.ng-deck{border-radius:12px;border:1px solid #9869e2;background:linear-gradient(145deg,#5c238e,#17123d);color:#fff;display:grid;place-items:center;text-align:center;font-weight:950;font-size:clamp(5.5px,.61vw,9px);cursor:pointer;box-shadow:inset 0 0 14px rgba(255,255,255,.04)}
+.ng-deck.chest{background:linear-gradient(145deg,#0d744e,#123820);border-color:#5be1aa}
+.ng-log{padding:4%;overflow:auto;font-size:clamp(5px,.55vw,8.3px);line-height:1.25}
+.ng-log div{padding:2.2px 0;border-bottom:1px solid #ffffff0c}
+.ng-log b{color:#ffe471}
+
+#ngBack{position:absolute;left:19%;top:18%;pointer-events:auto;z-index:35;border-radius:9px;border:1px solid #7b70b0;background:rgba(14,17,49,.93);color:#fff;padding:.45em .8em;font-weight:900;font-size:clamp(6px,.65vw,10px);cursor:pointer}
+#ngMap{position:absolute;right:19%;top:18%;z-index:35;border-radius:9px;border:1px solid #4d4774;background:rgba(14,17,49,.93);color:#dfe4ff;padding:.45em .8em;font-weight:800;font-size:clamp(6px,.65vw,10px)}
+
+#ngModal{position:absolute;inset:0;z-index:70;display:none;place-items:center;background:rgba(5,7,20,.72);backdrop-filter:blur(3px);pointer-events:auto;padding:5%}
+#ngModal.on{display:grid}
+.ng-modal-card{width:min(72%,620px);max-height:78%;overflow:auto;border-radius:20px;background:linear-gradient(180deg,#1c1547,#090d29);border:1px solid #a475ff;box-shadow:0 20px 50px #000c,0 0 32px rgba(142,64,255,.22);padding:4%;position:relative}
+.ng-modal-card:before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,210,103,.13);border-radius:15px;pointer-events:none}
+.ng-modal-title{font-size:clamp(13px,1.4vw,21px);font-weight:950;color:#ffe477}
+.ng-modal-body{font-size:clamp(8px,.82vw,12px);line-height:1.4;color:#eff1ff;margin-top:2%}
+.ng-modal-actions{display:flex;gap:3%;flex-wrap:wrap;margin-top:4%}
+.ng-modal-btn{flex:1;min-height:34px;border-radius:10px;border:1px solid #7468b6;background:#211b57;color:#fff;font-weight:900;cursor:pointer}
+.ng-modal-btn.gold{background:linear-gradient(#bd7918,#653502);border-color:#ffd06b}
+.ng-modal-btn.purple{background:linear-gradient(#9130ea,#4f0a99);border-color:#d17dff}
+.ng-card-flip{display:grid;place-items:center;min-height:110px;border-radius:15px;background:linear-gradient(145deg,#5d2291,#18103c);border:1px solid #b578ff;box-shadow:inset 0 0 24px rgba(255,255,255,.05);animation:ngCardReveal .48s ease both}
+.ng-card-flip.chest{background:linear-gradient(145deg,#0e7650,#11371f);border-color:#5be3aa}
+@keyframes ngCardReveal{from{transform:rotateY(90deg) scale(.86);opacity:.2}to{transform:rotateY(0) scale(1);opacity:1}}
+@media(max-width:900px){#ngHud{left:24%;width:52%;top:24%;height:47%}.ng-btn{font-size:clamp(5px,.95vw,8px)}}
