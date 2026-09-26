@@ -1,8 +1,9 @@
-const CACHE = 'nerdopoles-v0.3-immersive';
+const CACHE = 'nerdopoles-v0.4-play-config';
 const APP_SHELL = [
   '/manifest.webmanifest',
   '/icons/icon.svg',
-  '/assets/nerdopoles-menu.jpg'
+  '/assets/nerdopoles-menu.jpg',
+  '/assets/nerdopoles-config.jpg'
 ];
 
 self.addEventListener('install', event => {
