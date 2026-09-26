@@ -6,10 +6,11 @@
   "lang": "pt-BR",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "landscape",
-  "background_color": "#000000",
-  "theme_color": "#05050b",
+  "background_color": "#050008",
+  "theme_color": "#090012",
   "icons": [
     {
       "src": "/icons/icon.svg",
