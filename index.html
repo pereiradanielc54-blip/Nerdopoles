@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0b0b22" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nerdópoles" />
+  <title>Nerdópoles</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#080819; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overscroll-behavior:none; touch-action:none; user-select:none; }
+    #app { position:fixed; inset:0; width:100vw; height:100dvh; overflow:hidden; background:#080819; }
+    .ambient { position:absolute; inset:-8%; background:url('/assets/nerdopoles-menu.jpg') center/cover no-repeat; filter:blur(26px) brightness(.33) saturate(1.25); transform:scale(1.12); }
+    .menu-shell { position:absolute; inset:0; display:grid; place-items:center; padding:max(env(safe-area-inset-top),8px) max(env(safe-area-inset-right),8px) max(env(safe-area-inset-bottom),8px) max(env(safe-area-inset-left),8px); }
+    .menu-art { display:block; width:100%; height:100%; object-fit:contain; object-position:center; pointer-events:none; -webkit-user-drag:none; }
+    .rotate-lock { display:none; position:absolute; inset:0; z-index:20; place-items:center; padding:28px; text-align:center; background:radial-gradient(circle at 50% 35%,#2a1660,#070716 66%); }
+    .rotate-card { max-width:420px; padding:24px 22px; border:1px solid rgba(200,167,255,.35); border-radius:24px; background:rgba(11,9,31,.86); box-shadow:0 18px 60px rgba(0,0,0,.48); }
+    .rotate-icon { font-size:52px; line-height:1; margin-bottom:14px; }
+    .rotate-title { margin:0 0 8px; font-size:22px; font-weight:800; }
+    .rotate-text { margin:0; opacity:.82; line-height:1.45; }
+    @media (orientation: landscape) and (max-height: 700px) {
+      .rotate-lock { display:grid; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" aria-label="Menu inicial do Nerdópoles">
+    <div class="ambient" aria-hidden="true"></div>
+    <section class="menu-shell">
+      <img class="menu-art" src="/assets/nerdopoles-menu.jpg" alt="Menu oficial do Nerdópoles" draggable="false" />
+    </section>
+    <section class="rotate-lock" aria-live="polite">
+      <div class="rotate-card">
+        <div class="rotate-icon">📱</div>
+        <h1 class="rotate-title">Nerdópoles é jogado em modo retrato</h1>
+        <p class="rotate-text">Gire o celular para a posição vertical para continuar.</p>
+      </div>
+    </section>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>
