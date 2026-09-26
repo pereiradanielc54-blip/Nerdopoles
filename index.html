@@ -82,11 +82,25 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 #toast{position:absolute;left:50%;bottom:2.1%;transform:translate(-50%,12px);z-index:35;background:rgba(8,10,34,.96);border:1px solid #b16dff;color:#fff;padding:.4rem .75rem;border-radius:999px;font-weight:700;font-size:clamp(7px,.85vw,12px);opacity:0;transition:.16s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 .rotate{display:none;position:absolute;inset:0;z-index:60;place-items:center;background:#080819;color:#fff;text-align:center;padding:28px}.rotate>div{max-width:420px;padding:24px;border-radius:22px;background:#12102a;border:1px solid #c8a7ff55}.rotate h2{margin:0 0 8px}.rotate p{margin:0;opacity:.82}
+#bootUpdate{position:absolute;inset:0;z-index:120;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,rgba(109,30,190,.34),transparent 38%),#070616;color:#fff;transition:opacity .22s ease;pointer-events:auto}
+#bootUpdate.hide{opacity:0;pointer-events:none}
+.boot-card{min-width:min(78vw,360px);padding:22px 24px;border-radius:20px;background:rgba(17,14,43,.94);border:1px solid rgba(193,146,255,.4);box-shadow:0 20px 60px #0009;text-align:center}
+.boot-logo{font-weight:1000;font-size:clamp(20px,4vw,34px);letter-spacing:.03em;color:#ffe27a;text-shadow:0 0 18px rgba(193,75,255,.45)}
+.boot-status{margin-top:10px;font-size:13px;color:#d9d9ff}
+.boot-spinner{width:32px;height:32px;margin:16px auto 0;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#bc5cff;animation:bootSpin .8s linear infinite}
+@keyframes bootSpin{to{transform:rotate(360deg)}}
 @media(orientation:portrait){.rotate{display:grid}}
 </style>
 </head>
 <body>
 <main id="app">
+<section id="bootUpdate" aria-live="polite">
+  <div class="boot-card">
+    <div class="boot-logo">NERDÓPOLES</div>
+    <div id="bootStatus" class="boot-status">Verificando atualizações...</div>
+    <div class="boot-spinner"></div>
+  </div>
+</section>
 <section id="stage" class="stage">
 <div id="frame" class="frame">
 <img id="art" class="art" src="/assets/nerdopoles-menu.jpg" width="1536" height="864" draggable="false" fetchpriority="high" decoding="sync">
@@ -209,12 +223,46 @@ window.addEventListener('popstate',()=>{if(location.hash==='#tabuleiro')showBoar
 window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);fit();if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false);
 async function immersive(){try{if(screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(_){}try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(_){}}
 document.addEventListener('pointerdown',immersive,{once:true,passive:true});
-if('serviceWorker'in navigator){let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});await reg.update();const update=()=>reg.update().catch(()=>{});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){update();fit();immersive()}});window.addEventListener('focus',()=>{update();fit();immersive()})}catch(_){}})}
+if('serviceWorker'in navigator){
+  let reloading=false;
+  const boot=document.getElementById('bootUpdate'),bootStatus=document.getElementById('bootStatus');
+  const hideBoot=()=>{setTimeout(()=>{if(boot){boot.classList.add('hide');setTimeout(()=>boot.remove(),260)}},180)};
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloading)return;
+    reloading=true;
+    if(bootStatus)bootStatus.textContent='Atualização encontrada. Aplicando...';
+    location.reload();
+  });
+  window.addEventListener('load',async()=>{
+    try{
+      if(bootStatus)bootStatus.textContent='Verificando atualizações...';
+      const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+      let serverVersion=null;
+      try{
+        const vr=await fetch('/version.json?cold='+Date.now(),{cache:'no-store'});
+        if(vr.ok)serverVersion=(await vr.json()).version||null;
+      }catch(_){}
+      const previous=localStorage.getItem('nerdopoles-app-version');
+      await reg.update();
+      if(serverVersion)localStorage.setItem('nerdopoles-app-version',serverVersion);
+      if(bootStatus)bootStatus.textContent=(previous&&serverVersion&&previous!==serverVersion)?'Nova versão carregada.':'Jogo atualizado.';
+      hideBoot();
+    }catch(_){
+      if(bootStatus)bootStatus.textContent='Abrindo versão disponível...';
+      hideBoot();
+    }
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){fit();immersive()}});
+  window.addEventListener('focus',()=>{fit();immersive()});
+}else{
+  const boot=document.getElementById('bootUpdate');
+  window.addEventListener('load',()=>{setTimeout(()=>boot&&boot.remove(),350)});
+}
 })();
 </script>
 
-<link rel="stylesheet" href="/board-v2.css">
-<script src="/board-v2.js" defer></script>
+<link rel="stylesheet" href="/board-v2.css?v=102">
+<script src="/board-v2.js?v=102" defer></script>
 
 </body>
 </html>
