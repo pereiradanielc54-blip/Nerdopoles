@@ -50,17 +50,44 @@
       place-items:center;
       overflow:hidden;
     }
-    .menu-art{
+    .art-frame{
+      position:relative;
       width:100%;
       height:100%;
-      max-width:100%;
-      max-height:100%;
+      overflow:hidden;
+    }
+    .screen-art{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
       display:block;
       object-fit:contain;
       object-position:center;
       image-rendering:auto;
       -webkit-user-drag:none;
       pointer-events:none;
+    }
+    .hotspot{
+      position:absolute;
+      z-index:10;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .hotspot:focus-visible{
+      outline:3px solid rgba(255,255,255,.92);
+      outline-offset:2px;
+      border-radius:14px;
+    }
+    #playHotspot{
+      left:1.15%;
+      top:18.75%;
+      width:24%;
+      height:11.9%;
     }
     .rotate-lock{
       display:none;
@@ -92,18 +119,22 @@
   </style>
 </head>
 <body>
-  <main id="app" aria-label="Menu principal do Nerdópoles">
-    <section class="visual-stage" aria-label="Arte oficial do menu">
-      <img
-        class="menu-art"
-        src="/assets/nerdopoles-menu.jpg"
-        alt="Menu principal oficial do Nerdópoles"
-        width="1536"
-        height="864"
-        draggable="false"
-        fetchpriority="high"
-        decoding="sync"
-      >
+  <main id="app" aria-label="Nerdópoles">
+    <section id="visualStage" class="visual-stage" aria-label="Tela do jogo">
+      <div id="artFrame" class="art-frame">
+        <img
+          id="screenArt"
+          class="screen-art"
+          src="/assets/nerdopoles-menu.jpg"
+          alt="Menu principal oficial do Nerdópoles"
+          width="1536"
+          height="864"
+          draggable="false"
+          fetchpriority="high"
+          decoding="sync"
+        >
+        <button id="playHotspot" class="hotspot" type="button" aria-label="Jogar"></button>
+      </div>
     </section>
 
     <section class="rotate-lock" aria-live="polite">
@@ -117,6 +148,69 @@
 
   <script>
     (() => {
+      const MENU_SRC = '/assets/nerdopoles-menu.jpg';
+      const CONFIG_SRC = '/assets/nerdopoles-config.jpg';
+
+      const stage = document.getElementById('visualStage');
+      const frame = document.getElementById('artFrame');
+      const screenArt = document.getElementById('screenArt');
+      const playHotspot = document.getElementById('playHotspot');
+
+      const fitArtwork = () => {
+        const w = stage.clientWidth;
+        const h = stage.clientHeight;
+        if (!w || !h) return;
+
+        const ratio = 16 / 9;
+        let fw = w;
+        let fh = fw / ratio;
+
+        if (fh > h) {
+          fh = h;
+          fw = fh * ratio;
+        }
+
+        frame.style.width = fw + 'px';
+        frame.style.height = fh + 'px';
+      };
+
+      const showScreen = (screen, pushHistory = false) => {
+        const isConfig = screen === 'config';
+
+        screenArt.src = isConfig ? CONFIG_SRC : MENU_SRC;
+        screenArt.alt = isConfig
+          ? 'Tela oficial de configuração da partida do Nerdópoles'
+          : 'Menu principal oficial do Nerdópoles';
+
+        playHotspot.hidden = isConfig;
+
+        if (pushHistory) {
+          history.pushState(
+            { screen: isConfig ? 'config' : 'menu' },
+            '',
+            isConfig ? '#configuracao' : location.pathname
+          );
+        }
+      };
+
+      const configPreload = new Image();
+      configPreload.src = CONFIG_SRC;
+
+      playHotspot.addEventListener('click', () => {
+        showScreen('config', true);
+      });
+
+      window.addEventListener('popstate', () => {
+        showScreen(location.hash === '#configuracao' ? 'config' : 'menu');
+      });
+
+      window.addEventListener('resize', fitArtwork);
+      window.addEventListener('orientationchange', fitArtwork);
+      if ('ResizeObserver' in window) new ResizeObserver(fitArtwork).observe(stage);
+      fitArtwork();
+
+      showScreen(location.hash === '#configuracao' ? 'config' : 'menu');
+
       const tryImmersive = async () => {
         try {
           if (screen.orientation?.lock) await screen.orientation.lock('landscape');
@@ -129,9 +223,8 @@
         } catch (_) {}
       };
 
-      // Em uma PWA instalada com display: fullscreen, o Android já abre sem
-      // barras do navegador/status. Em navegador comum, a API exige gesto do usuário.
       window.addEventListener('pageshow', () => {
+        fitArtwork();
         if (window.matchMedia('(display-mode: fullscreen)').matches) {
           tryImmersive();
         }
@@ -161,11 +254,13 @@
           document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
               checkUpdate();
+              fitArtwork();
               tryImmersive();
             }
           });
           window.addEventListener('focus', () => {
             checkUpdate();
+            fitArtwork();
             tryImmersive();
           });
         } catch (_) {}
