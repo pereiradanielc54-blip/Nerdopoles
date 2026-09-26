@@ -1,5 +1,5 @@
-const CACHE='nerdopoles-v0.9-live-board';
-const APP_SHELL=['/','/index.html','/manifest.webmanifest','/icons/icon.svg','/assets/nerdopoles-menu.jpg','/assets/nerdopoles-config.jpg','/assets/nerdopoles-board-01.png'];
+const CACHE='nerdopoles-v1.0-board-v2';
+const APP_SHELL=['/board-v2.css','/board-v2.js','/assets/nerdopoles-pieces.png','/','/index.html','/manifest.webmanifest','/icons/icon.svg','/assets/nerdopoles-menu.jpg','/assets/nerdopoles-config.jpg','/assets/nerdopoles-board-01.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
