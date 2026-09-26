@@ -2,7 +2,6 @@
 (function(){
 'use strict';
 var BOARD='/assets/nerdopoles-board-01.png';
-var PIECE_SHEET='/assets/nerdopoles-pieces.png';
 var PIECE_NAMES=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
 var FALLBACK=['🐱','🎩','🧰','⚔️','🛡️','🛸'];
 var COLORS=['#a94cff','#39b9ff','#ff5a62','#4edb83','#ffc93f','#ff62c7'];
@@ -44,7 +43,7 @@ for(i=11;i<=20;i++)positions.push([91.3,17+(i-11)*7.8]);
 for(i=21;i<=30;i++)positions.push([83.7-(i-21)*8.25,89.1]);
 for(i=31;i<=39;i++)positions.push([8.65,81.3-(i-31)*8.2]);
 
-var game=null,root=null,logs=[],moving=false,pieceSprites=[],piecePromise=null;
+var game=null,root=null,logs=[],moving=false,pieceSprites=['/assets/tokens/token-0.png','/assets/tokens/token-1.png','/assets/tokens/token-2.png','/assets/tokens/token-3.png','/assets/tokens/token-4.png','/assets/tokens/token-5.png'];
 
 function cfg(){
   try{return JSON.parse(localStorage.getItem('nerdopoles-config')||'{}')}catch(e){return {}}
@@ -85,7 +84,6 @@ function mount(){
   frame.appendChild(d);root=d;
   for(i=0;i<40;i++){var q=document.createElement('div');q.className='ng-slot';q.style.left=positions[i][0]+'%';q.style.top=positions[i][1]+'%';document.getElementById('ngSlots').appendChild(q)}
   bind();
-  if(!piecePromise)piecePromise=loadPieceSprites();
 }
 
 function bind(){
@@ -102,40 +100,20 @@ function bind(){
   window.addEventListener('popstate',function(){if(location.hash!=='#tabuleiro')hide()});
 }
 
-async function loadPieceSprites(){
-  return new Promise(function(resolve){
-    var img=new Image();
-    img.onload=function(){
-      try{
-        for(var n=0;n<6;n++)pieceSprites[n]=extractPiece(img,n);
-      }catch(e){pieceSprites=[]}
-      if(game)renderTokens();
-      resolve(pieceSprites);
-    };
-    img.onerror=function(){resolve([])};
-    img.src=PIECE_SHEET;
+async function normalizeGameState(g){
+  if(!g||!Array.isArray(g.p))return g;
+  var used={};
+  g.p.forEach(function(p,idx){
+    var piece=Number.isInteger(p.piece)?p.piece:FALLBACK.indexOf(p.e);
+    if(piece<0||piece>5||used[piece]){
+      var available=[0,1,2,3,4,5].filter(function(n){return !used[n]});
+      piece=available.length?available[Math.floor(Math.random()*available.length)]:idx%6;
+    }
+    p.piece=piece;used[piece]=true;
+    if(!p.c)p.c=COLORS[idx%COLORS.length];
   });
-}
-function extractPiece(img,index){
-  var size=512,sx=(index%3)*size,sy=Math.floor(index/3)*size;
-  var c=document.createElement('canvas');c.width=size;c.height=size;
-  var x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,sx,sy,size,size,0,0,size,size);
-  var im=x.getImageData(0,0,size,size),d=im.data,total=size*size,seen=new Uint8Array(total),queue=new Int32Array(total),head=0,tail=0;
-  function bg(p){var k=p*4,r=d[k],g=d[k+1],b=d[k+2];return Math.max(r,g,b)-Math.min(r,g,b)<=4&&r>198}
-  function add(p){if(p<0||p>=total||seen[p]||!bg(p))return;seen[p]=1;queue[tail++]=p}
-  for(var z=0;z<size;z++){add(z);add((size-1)*size+z);add(z*size);add(z*size+size-1)}
-  while(head<tail){
-    var p=queue[head++],k=p*4;d[k+3]=0;var px=p%size,py=(p/size)|0;
-    if(px)add(p-1);if(px<size-1)add(p+1);if(py)add(p-size);if(py<size-1)add(p+size);
-  }
-  x.putImageData(im,0,0);
-  var minX=size,minY=size,maxX=0,maxY=0;
-  for(var yy=0;yy<size;yy++)for(var xx=0;xx<size;xx++){if(d[(yy*size+xx)*4+3]>20){if(xx<minX)minX=xx;if(xx>maxX)maxX=xx;if(yy<minY)minY=yy;if(yy>maxY)maxY=yy}}
-  if(maxX<=minX||maxY<=minY)return '';
-  var pad=10;minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(size-1,maxX+pad);maxY=Math.min(size-1,maxY+pad);
-  var w=maxX-minX+1,h=maxY-minY+1,out=document.createElement('canvas');out.width=240;out.height=240;var o=out.getContext('2d'),scale=Math.min(220/w,220/h),dw=w*scale,dh=h*scale;
-  o.drawImage(c,minX,minY,w,h,(240-dw)/2,(240-dh)/2,dw,dh);
-  return out.toDataURL('image/png');
+  g.version=2;
+  return g;
 }
 
 function newGame(){
@@ -143,18 +121,17 @@ function newGame(){
   var colors=shuffle(COLORS.slice()),avail=[0,1,2,3,4,5].filter(function(n){return n!==chosen});shuffle(avail);
   var ps=[player(0,'Você',chosen,colors[0],money)];
   for(var n=1;n<=b;n++)ps.push(player(n,'BOT '+n,avail[(n-1)%avail.length],colors[n%colors.length],money));
-  return {c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,a:{},created:Date.now()};
+  return {version:2,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,a:{},created:Date.now()};
 }
 function player(id,name,piece,color,money){return{id:id,n:name,piece:piece,c:color,m:money,pos:0,props:[],jail:false,jt:0,key:0,dead:false,dbl:0}}
 
 async function start(){
   mount();game=newGame();logs=[];root.classList.add('on');log('<b>A aventura começou.</b> Todas as peças entraram pelo Portal de Nerdora.');save();render();
-  if(piecePromise)await piecePromise;
   renderTokens();
 }
 function resume(){
   mount();try{game=JSON.parse(localStorage.getItem('nerdopoles-game')||'null')}catch(e){game=null}
-  if(!game)game=newGame();root.classList.add('on');render();
+  if(!game)game=newGame();game=normalizeGameState(game);root.classList.add('on');render();
   if(game.t!==0&&game.phase==='roll')setTimeout(botTurn,900);
 }
 function hide(){if(root)root.classList.remove('on')}
@@ -170,8 +147,8 @@ function renderTokens(){
   game.p.forEach(function(p,k){
     if(p.dead)return;var n=count[p.pos]||0;count[p.pos]=n+1,o=[[0,0],[11,-7],[-11,7],[12,8],[-12,-8],[0,13]][n%6],t=document.createElement('div');
     t.className='ng-token'+(k===0?' me':'');t.style.left='calc('+positions[p.pos][0]+'% + '+o[0]+'px)';t.style.top='calc('+positions[p.pos][1]+'% + '+o[1]+'px)';
-    if(pieceSprites[p.piece]){var im=document.createElement('img');im.src=pieceSprites[p.piece];im.alt=PIECE_NAMES[p.piece];t.appendChild(im)}
-    else{var f=document.createElement('span');f.className='fallback';f.style.setProperty('--c',p.c);f.textContent=FALLBACK[p.piece];t.appendChild(f)}
+    if(pieceSprites[p.piece]){var im=document.createElement('img');im.src=pieceSprites[p.piece];im.alt=PIECE_NAMES[p.piece];im.onerror=function(){this.style.display='none';var f=document.createElement('span');f.className='fallback';f.style.setProperty('--c',p.c);f.textContent=FALLBACK[p.piece]||'◆';t.appendChild(f)};t.appendChild(im)}
+    else{var f=document.createElement('span');f.className='fallback';f.style.setProperty('--c',p.c);f.textContent=FALLBACK[p.piece]||'◆';t.appendChild(f)}
     e.appendChild(t);
   });
 }
