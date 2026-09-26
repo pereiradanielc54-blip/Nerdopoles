@@ -1,0 +1,35 @@
+name: Importar pecas Nerdopoles
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/import-pieces.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import-pieces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - name: Baixar arte exata das pecas
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          URL_B64='aHR0cHM6Ly9kMmpxcm02b3phOG5iNi5jbG91ZGZyb250Lm5ldC9kYXRhc2V0cy83Y2RhNWM0NS1lNTkyLTQxNjYtOGE5OC0zM2ZkNWY3YTQ4YjMucG5nP19qd3Q9ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnJaWGxJWVhOb0lqb2lOR1U1TXpFMk1UQXpaREUxT1dSak9TSXNJbUoxWTJ0bGRDSTZJbkoxYm5kaGVTMWtZWFJoYzJWMGN5SXNJbk4wWVdkbElqb2ljSEp2WkNJc0ltVjRjQ0k2TVRjNU1EWXhNVEE0T0gwLnprNmpKOWY3Yk5vWFU0VEplRk5nRVEzUEN3STRvaUtvR21zX0ZYNXZlQzA='
+          URL="$(printf '%s' "$URL_B64" | base64 -d)"
+          curl --fail --location --retry 3 "$URL" -o assets/nerdopoles-pieces.png
+          test -s assets/nerdopoles-pieces.png
+          file assets/nerdopoles-pieces.png
+          sha256sum assets/nerdopoles-pieces.png
+      - name: Salvar no repositorio
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/nerdopoles-pieces.png
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Add exact Nerdopoles piece artwork"
+          git push origin main
