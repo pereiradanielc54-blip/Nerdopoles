@@ -1,4 +1,4 @@
-const CACHE = 'nerdopoles-v0.4-play-config';
+const CACHE = 'nerdopoles-v0.5-config-controls';
 const APP_SHELL = [
   '/manifest.webmanifest',
   '/icons/icon.svg',
@@ -28,7 +28,6 @@ self.addEventListener('message', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-
   const isNavigation = event.request.mode === 'navigate';
 
   if (isNavigation) {
