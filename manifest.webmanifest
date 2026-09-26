@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "Nerdópoles",
   "short_name": "Nerdópoles",
   "description": "O mundo de Nerdora em um tabuleiro.",
@@ -6,15 +7,15 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#080819",
-  "theme_color": "#0b0b22",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#05050b",
   "icons": [
     {
       "src": "/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
