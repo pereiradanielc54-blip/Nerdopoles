@@ -104,6 +104,7 @@ async function normalizeGameState(g){
   if(!g||!Array.isArray(g.p))return g;
   var used={};
   g.p.forEach(function(p,idx){
+    if(typeof p.pos!=='number'||p.pos<0||p.pos>39)p.pos=0;
     var piece=Number.isInteger(p.piece)?p.piece:FALLBACK.indexOf(p.e);
     if(piece<0||piece>5||used[piece]){
       var available=[0,1,2,3,4,5].filter(function(n){return !used[n]});
@@ -145,10 +146,36 @@ function render(){if(!game)return;renderTokens();renderOwners();renderPlayers();
 function renderTokens(){
   if(!game)return;var e=document.getElementById('ngTokens');if(!e)return;e.innerHTML='';var count={};
   game.p.forEach(function(p,k){
-    if(p.dead)return;var n=count[p.pos]||0;count[p.pos]=n+1,o=[[0,0],[11,-7],[-11,7],[12,8],[-12,-8],[0,13]][n%6],t=document.createElement('div');
-    t.className='ng-token'+(k===0?' me':'');t.style.left='calc('+positions[p.pos][0]+'% + '+o[0]+'px)';t.style.top='calc('+positions[p.pos][1]+'% + '+o[1]+'px)';
-    if(pieceSprites[p.piece]){var im=document.createElement('img');im.src=pieceSprites[p.piece];im.alt=PIECE_NAMES[p.piece];im.onerror=function(){this.style.display='none';var f=document.createElement('span');f.className='fallback';f.style.setProperty('--c',p.c);f.textContent=FALLBACK[p.piece]||'◆';t.appendChild(f)};t.appendChild(im)}
-    else{var f=document.createElement('span');f.className='fallback';f.style.setProperty('--c',p.c);f.textContent=FALLBACK[p.piece]||'◆';t.appendChild(f)}
+    if(p.dead)return;
+    var n=count[p.pos]||0;count[p.pos]=n+1;
+    var offsets=[[0,0],[15,-9],[-15,9],[16,10],[-16,-10],[0,17]],o=offsets[n%offsets.length];
+    var t=document.createElement('div');
+    t.className='ng-token'+(k===0?' me':'');
+    t.style.left='calc('+positions[p.pos][0]+'% + '+o[0]+'px)';
+    t.style.top='calc('+positions[p.pos][1]+'% + '+o[1]+'px)';
+    t.style.setProperty('--c',p.c||COLORS[k%COLORS.length]);
+
+    var fallback=document.createElement('span');
+    fallback.className='fallback';
+    fallback.style.setProperty('--c',p.c||COLORS[k%COLORS.length]);
+    fallback.textContent=FALLBACK[p.piece]||'◆';
+    t.appendChild(fallback);
+
+    var badge=document.createElement('i');
+    badge.className='token-badge';
+    badge.style.setProperty('--c',p.c||COLORS[k%COLORS.length]);
+    t.appendChild(badge);
+
+    var src=pieceSprites[p.piece];
+    if(src){
+      var im=document.createElement('img');
+      im.src=src+'?v=102';
+      im.alt=PIECE_NAMES[p.piece]||'Peça Nerdópoles';
+      im.decoding='async';
+      im.onload=function(){fallback.style.opacity='0'};
+      im.onerror=function(){this.remove();fallback.style.opacity='1'};
+      t.appendChild(im);
+    }
     e.appendChild(t);
   });
 }
