@@ -1,199 +1,176 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#090012">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Nerdópoles">
-<title>Nerdópoles</title>
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#050008}
-body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:manipulation;user-select:none}
-#app{position:fixed;inset:0;width:100vw;height:100dvh;min-height:100svh;overflow:hidden;display:grid;place-items:center;background:radial-gradient(ellipse at 0% 50%,rgba(147,35,255,.62),rgba(99,16,185,.28) 24%,transparent 65%),radial-gradient(ellipse at 100% 50%,rgba(147,35,255,.62),rgba(99,16,185,.28) 24%,transparent 65%),#050008}
-.stage{position:absolute;top:env(safe-area-inset-top,0);right:env(safe-area-inset-right,0);bottom:env(safe-area-inset-bottom,0);left:env(safe-area-inset-left,0);display:grid;place-items:center;overflow:hidden}
-.frame{position:relative;width:100%;height:100%;overflow:hidden}
-.art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;-webkit-user-drag:none;pointer-events:none}
-.hot{position:absolute;z-index:20;border:0;padding:0;background:transparent;cursor:pointer}
-#play{left:1.15%;top:18.75%;width:24%;height:11.9%}
-#config{position:absolute;inset:0;z-index:15;display:none}
-#config.on{display:block}
-#back{left:1.05%;top:1.7%;width:11.2%;height:7.7%;border-radius:16px}
-
-/* Dificuldade: mantém a arte original e cobre somente a marca fixa da imagem */
-.diff-mask{position:absolute;left:2.0%;top:28.2%;width:20.2%;height:43.2%;z-index:18}
-.diff{position:absolute;left:0;width:100%;height:22.7%;border:0;border-radius:17px;background:transparent;cursor:pointer}
-.diff:nth-child(1){top:0}.diff:nth-child(2){top:25.6%}.diff:nth-child(3){top:51.2%}.diff:nth-child(4){top:76.8%}
-.diff::before{content:"";position:absolute;inset:2px;border-radius:15px;box-shadow:inset 0 0 0 3px transparent}
-.diff.selected::before{box-shadow:inset 0 0 0 3px #ffd34f,0 0 16px rgba(255,204,64,.72)}
-.diff.selected::after{content:"✓";position:absolute;right:3.4%;top:12%;width:10%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:#39d268;color:#fff;font-weight:900;font-size:clamp(8px,1.1vw,16px);box-shadow:0 0 7px rgba(85,255,131,.8)}
-#eraseEasyCheck{position:absolute;z-index:17;left:20.08%;top:29.75%;width:1.9%;aspect-ratio:1;border-radius:50%;background:#0d7e38;box-shadow:0 0 3px #0d7e38;pointer-events:none}
-
-/* Bots: recriado inteiro para esconder o 3 fixo da imagem */
-#botsPanel{position:absolute;z-index:19;left:23.72%;top:37.85%;width:18.55%;height:17.1%;background:linear-gradient(180deg,#11193a 0%,#0a102b 100%);border:1px solid rgba(94,123,190,.42);border-radius:10px;padding:1.3% 1.3% .7%;box-shadow:inset 0 0 18px rgba(41,57,112,.35)}
-#botsButtons{height:42%;display:flex;gap:2.2%;align-items:center}
-.bot{flex:1;height:82%;border-radius:8px;border:1px solid #6287c9;background:linear-gradient(#273f75,#0a1537);color:#fff;font-weight:900;font-size:clamp(11px,1.7vw,26px);cursor:pointer;box-shadow:inset 0 0 8px rgba(110,151,255,.28)}
-.bot.selected{border-color:#ffd667;background:linear-gradient(#d48a0c,#713800);box-shadow:0 0 12px #ffba20,inset 0 0 7px rgba(255,245,156,.62)}
-#players{height:58%;display:grid;place-items:center;text-align:center;color:#f6f6ff;font-weight:800;font-size:clamp(7px,1vw,15px);line-height:1.18}
-
-/* Mapa: área recriada para remover seleção fixa e texto antigo */
-#mapPanel{position:absolute;z-index:19;left:23.72%;top:57.75%;width:18.55%;height:29.6%;background:linear-gradient(180deg,rgba(12,16,45,.98),rgba(7,11,31,.98));border:1px solid rgba(111,91,170,.48);border-radius:10px;box-shadow:inset 0 0 20px rgba(75,36,140,.22)}
-#mapPanel .label{position:absolute;top:1.7%;left:0;width:100%;text-align:center;color:#fff;font-weight:900;font-size:clamp(7px,.85vw,13px)}
-#mapPreview{position:absolute;left:20%;top:13%;width:60%;height:33%;border-radius:8px;border:1px solid rgba(145,179,255,.35);overflow:hidden;background:linear-gradient(180deg,#8351ff,#1c103d)}
-#mapPreview .scene{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 35%),linear-gradient(135deg,transparent 52%,rgba(255,255,255,.08) 53% 57%,transparent 58%);display:grid;place-items:end center;padding-bottom:8%;color:#fff;font-weight:900;font-size:clamp(7px,.8vw,12px);text-shadow:0 2px 4px #000}
-.mapArrow{position:absolute;top:20%;width:10.5%;height:18%;border-radius:7px;border:1px solid #5f79bc;background:#151d50;color:white;font-weight:900;font-size:clamp(14px,1.5vw,22px);cursor:pointer}
-#mapPrev{left:6%}#mapNext{right:6%}
-#mapName{position:absolute;left:20%;top:48%;width:60%;text-align:center;color:#fff;font-weight:900;font-size:clamp(8px,.9vw,14px)}
-#mapDesc{position:absolute;left:15%;top:58%;width:70%;height:20%;color:#eef0ff;font-size:clamp(6.5px,.76vw,11.5px);line-height:1.15}
-#changeMap{position:absolute;left:14%;bottom:5%;width:72%;height:14%;border-radius:8px;border:1px solid rgba(255,190,89,.4);background:linear-gradient(#263b7e,#0f1945);color:#fff;font-weight:900;font-size:clamp(7px,.85vw,13px);cursor:pointer}
-
-/* Peças: preserva ilustrações da imagem; neutraliza a seleção fixa e desenha somente a atual */
-#pieceMask{position:absolute;z-index:18;left:44.1%;top:34.15%;width:28.45%;height:35.95%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:3.1%}
-.piece{position:relative;border:0;border-radius:15px;background:transparent;cursor:pointer;box-shadow:inset 0 0 0 3px rgba(10,14,40,.93)}
-.piece::before{content:"";position:absolute;right:3%;top:3%;width:17%;aspect-ratio:1;border-radius:50%;background:rgba(10,14,40,.96);opacity:0}
-.piece:first-child::before{opacity:1}
-.piece.selected{box-shadow:inset 0 0 0 3px #ff4cff,0 0 18px rgba(225,46,255,.82)}
-.piece.selected::after{content:"✓";position:absolute;right:3%;top:3%;width:17%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:#d600ff;color:#fff;font-weight:900;font-size:clamp(8px,.9vw,14px)}
-.piece.selected::before{opacity:0}
-
-/* Configurações: cobre valores/descrições fixos, mantendo o painel e ícones da arte */
-#settingsCover{position:absolute;z-index:19;left:77.55%;top:28.4%;width:20.15%;height:47.2%;color:#fff}
-.setRow{position:absolute;left:0;width:100%;height:12.5%;display:grid;grid-template-columns:58% 10% 22% 10%;align-items:center;gap:0}
-.setRow.toggleRow{grid-template-columns:75% 25%}
-#durRow{top:0}#moneyRow{top:15.2%}#buildRow{top:30.4%}#tradeRow{top:49.1%}#auctionRow{top:65.4%}#eventRow{top:81.6%}
-.copy{align-self:stretch;background:rgba(15,18,48,.97);padding:4% 3%;display:flex;flex-direction:column;justify-content:center}
-.copy .ttl{font-weight:800;font-size:clamp(7px,.8vw,12.5px)}
-.copy .desc{font-size:clamp(6px,.68vw,10.5px);line-height:1.12;color:#cdd4ff;margin-top:.15em}
-.arr{height:62%;border:1px solid rgba(173,154,255,.3);background:#211a58;color:#fff;font-weight:900;font-size:clamp(12px,1.2vw,18px);cursor:pointer}
-.val{height:62%;display:grid;place-items:center;background:#17163f;font-weight:900;font-size:clamp(7px,.8vw,12px);text-align:center}
-.tog{justify-self:end;width:54%;height:52%;min-height:24px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:linear-gradient(90deg,#7700ff,#d000ff);position:relative;cursor:pointer;box-shadow:0 0 10px rgba(183,0,255,.5)}
-.tog::after{content:"";position:absolute;top:8%;right:5%;width:40%;height:84%;border-radius:50%;background:#fff;box-shadow:0 1px 5px #0007}
-.tog.off{background:#31374b;box-shadow:none}.tog.off::after{right:55%}
-
-/* iniciar permanece sem função */
-#startBlock{position:absolute;left:43.1%;top:78.2%;width:31.6%;height:16%;z-index:22;background:transparent}
-#toast{position:absolute;left:50%;bottom:2%;transform:translate(-50%,14px);z-index:30;background:#090b24ee;border:1px solid #b875ff;color:#fff;padding:.4rem .75rem;border-radius:999px;font-weight:700;font-size:clamp(7px,.9vw,13px);opacity:0;pointer-events:none;transition:.16s}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-.rotate{display:none;position:absolute;inset:0;z-index:50;place-items:center;background:#080819;color:#fff;text-align:center;padding:30px}.rotate div{max-width:420px;padding:24px;border:1px solid #b78eff55;border-radius:22px;background:#12102a}.rotate h2{margin:0 0 8px}.rotate p{margin:0;opacity:.8}
-@media(orientation:portrait){.rotate{display:grid}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#090012">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nerdópoles">
+  <title>Nerdópoles</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:#050008;
+    }
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      overscroll-behavior:none;
+      touch-action:manipulation;
+      user-select:none;
+    }
+    #app{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100dvh;
+      min-height:100svh;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(ellipse at 0% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
+        radial-gradient(ellipse at 100% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
+        #050008;
+    }
+    .visual-stage{
+      position:absolute;
+      top:env(safe-area-inset-top,0px);
+      right:env(safe-area-inset-right,0px);
+      bottom:env(safe-area-inset-bottom,0px);
+      left:env(safe-area-inset-left,0px);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+    .menu-art{
+      width:100%;
+      height:100%;
+      max-width:100%;
+      max-height:100%;
+      display:block;
+      object-fit:contain;
+      object-position:center;
+      image-rendering:auto;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+    .rotate-lock{
+      display:none;
+      position:absolute;
+      inset:0;
+      z-index:50;
+      place-items:center;
+      padding:28px;
+      text-align:center;
+      background:
+        radial-gradient(circle at 50% 36%, rgba(116,36,212,.34), transparent 44%),
+        #080819;
+      color:#fff;
+    }
+    .rotate-card{
+      max-width:420px;
+      padding:24px 22px;
+      border:1px solid rgba(200,167,255,.35);
+      border-radius:24px;
+      background:#12102a;
+      box-shadow:0 18px 60px rgba(0,0,0,.55);
+    }
+    .rotate-icon{font-size:52px;line-height:1;margin-bottom:14px}
+    .rotate-title{margin:0 0 8px;font-size:22px;font-weight:800}
+    .rotate-text{margin:0;opacity:.82;line-height:1.45}
+    @media (orientation:portrait){
+      .rotate-lock{display:grid}
+    }
+  </style>
 </head>
 <body>
-<main id="app">
-<section id="stage" class="stage">
-<div id="frame" class="frame">
-<img id="art" class="art" src="/assets/nerdopoles-menu.jpg" width="1536" height="864" draggable="false" fetchpriority="high">
-<button id="play" class="hot" aria-label="Jogar"></button>
+  <main id="app" aria-label="Menu principal do Nerdópoles">
+    <section class="visual-stage" aria-label="Arte oficial do menu">
+      <img
+        class="menu-art"
+        src="/assets/nerdopoles-menu.jpg"
+        alt="Menu principal oficial do Nerdópoles"
+        width="1536"
+        height="864"
+        draggable="false"
+        fetchpriority="high"
+        decoding="sync"
+      >
+    </section>
 
-<div id="config">
-<button id="back" class="hot" aria-label="Voltar"></button>
+    <section class="rotate-lock" aria-live="polite">
+      <div class="rotate-card">
+        <div class="rotate-icon">📱↔️</div>
+        <h1 class="rotate-title">Use o Nerdópoles em modo paisagem</h1>
+        <p class="rotate-text">Gire o celular para a posição horizontal para continuar.</p>
+      </div>
+    </section>
+  </main>
 
-<div id="eraseEasyCheck"></div>
-<div class="diff-mask">
-<button class="diff" data-i="0" aria-label="Fácil"></button>
-<button class="diff" data-i="1" aria-label="Normal"></button>
-<button class="diff" data-i="2" aria-label="Difícil"></button>
-<button class="diff" data-i="3" aria-label="Lendário"></button>
-</div>
+  <script>
+    (() => {
+      const tryImmersive = async () => {
+        try {
+          if (screen.orientation?.lock) await screen.orientation.lock('landscape');
+        } catch (_) {}
 
-<div id="botsPanel"><div id="botsButtons"></div><div id="players"></div></div>
+        try {
+          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+          }
+        } catch (_) {}
+      };
 
-<div id="mapPanel">
-<div class="label">MAPA SELECIONADO</div>
-<button id="mapPrev" class="mapArrow">‹</button><div id="mapPreview"><div class="scene"></div></div><button id="mapNext" class="mapArrow">›</button>
-<div id="mapName"></div><div id="mapDesc"></div><button id="changeMap">🗺️ &nbsp; ALTERAR MAPA</button>
-</div>
+      // Em uma PWA instalada com display: fullscreen, o Android já abre sem
+      // barras do navegador/status. Em navegador comum, a API exige gesto do usuário.
+      window.addEventListener('pageshow', () => {
+        if (window.matchMedia('(display-mode: fullscreen)').matches) {
+          tryImmersive();
+        }
+      });
 
-<div id="pieceMask">
-<button class="piece" data-i="0" aria-label="Nyan"></button><button class="piece" data-i="1" aria-label="Chapéu"></button><button class="piece" data-i="2" aria-label="Baú"></button>
-<button class="piece" data-i="3" aria-label="Espada"></button><button class="piece" data-i="4" aria-label="Escudo"></button><button class="piece" data-i="5" aria-label="Dirigível"></button>
-</div>
+      document.addEventListener('pointerdown', tryImmersive, { once:true, passive:true });
+      document.addEventListener('touchstart', tryImmersive, { once:true, passive:true });
 
-<div id="settingsCover">
-<div id="durRow" class="setRow"><div class="copy"><div class="ttl">Duração da Partida</div><div id="durDesc" class="desc"></div></div><button id="durPrev" class="arr">‹</button><div id="durVal" class="val"></div><button id="durNext" class="arr">›</button></div>
-<div id="moneyRow" class="setRow"><div class="copy"><div class="ttl">Dinheiro Inicial</div><div id="moneyDesc" class="desc"></div></div><button id="moneyPrev" class="arr">‹</button><div id="moneyVal" class="val"></div><button id="moneyNext" class="arr">›</button></div>
-<div id="buildRow" class="setRow"><div class="copy"><div class="ttl">Regras de Construção</div><div id="buildDesc" class="desc"></div></div><button id="buildPrev" class="arr">‹</button><div id="buildVal" class="val"></div><button id="buildNext" class="arr">›</button></div>
-<div id="tradeRow" class="setRow toggleRow"><div class="copy"><div class="ttl">Permitir Trocas</div><div id="tradeDesc" class="desc"></div></div><button id="trade" class="tog"></button></div>
-<div id="auctionRow" class="setRow toggleRow"><div class="copy"><div class="ttl">Leilões</div><div id="auctionDesc" class="desc"></div></div><button id="auction" class="tog"></button></div>
-<div id="eventRow" class="setRow toggleRow"><div class="copy"><div class="ttl">Cartas de Evento</div><div id="eventDesc" class="desc"></div></div><button id="event" class="tog"></button></div>
-</div>
-<div id="startBlock"></div><div id="toast"></div>
-</div>
-</div>
-</section>
-<section class="rotate"><div><h2>Use o Nerdópoles em modo paisagem</h2><p>Gire o celular para a posição horizontal para continuar.</p></div></section>
-</main>
+      if (!('serviceWorker' in navigator)) return;
 
-<script>
-(()=>{
-const MENU='/assets/nerdopoles-menu.jpg', CONFIG='/assets/nerdopoles-config.jpg';
-const diffNames=['Fácil','Normal','Difícil','Lendário'];
-const maps=[
-{name:'Cidade de Nerdora',theme:'linear-gradient(180deg,#8351ff,#1d103d)',desc:'O tabuleiro principal, com os locais mais icônicos do reino de Nerdora.'},
-{name:'Reino Celeste',theme:'linear-gradient(180deg,#6eb3ff,#4b50d8 46%,#171044)',desc:'Rotas aéreas e regiões mágicas para uma partida mais dinâmica.'},
-{name:'Distrito Arcano',theme:'linear-gradient(180deg,#d957ff,#5a207c 50%,#160a2a)',desc:'Mapa compacto, com eventos frequentes e disputa intensa por território.'}
-];
-const durations=[
-{v:'Rápida',d:'Termina mais cedo por patrimônio e progresso.'},
-{v:'Clássica',d:'Até um jogador falir.'},
-{v:'Longa',d:'Mais tempo para construir e dominar o tabuleiro.'}
-];
-const money=[
-{v:'1.000',d:'Começo enxuto; cada compra pesa mais.'},
-{v:'1.500',d:'Equilíbrio padrão para uma partida clássica.'},
-{v:'2.000',d:'Mais liberdade para investir no início.'}
-];
-const builds=[
-{v:'Rápida',d:'Construção facilitada e evolução acelerada.'},
-{v:'Padrão',d:'Terrenos, Casas e Hotéis normais.'},
-{v:'Estratégica',d:'Construções mais controladas e planejadas.'}
-];
-const defaults={difficulty:0,bots:3,piece:0,map:0,dur:1,money:1,build:1,trades:true,auctions:true,events:true};
-let s={...defaults};try{Object.assign(s,JSON.parse(localStorage.getItem('nerdopoles-match-config')||'{}'))}catch(_){}
-const $=id=>document.getElementById(id), stage=$('stage'), frame=$('frame'), art=$('art'), play=$('play'), cfg=$('config'), toast=$('toast');
-let tt;
-function save(){try{localStorage.setItem('nerdopoles-match-config',JSON.stringify(s))}catch(_){}}
-function note(t){toast.textContent=t;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove('show'),1000)}
-function fit(){const w=stage.clientWidth,h=stage.clientHeight,r=16/9;if(!w||!h)return;let fw=w,fh=fw/r;if(fh>h){fh=h;fw=fh*r}frame.style.width=fw+'px';frame.style.height=fh+'px'}
-function cycle(k,a,d){s[k]=(s[k]+d+a.length)%a.length;save();render()}
-function render(){
-document.querySelectorAll('.diff').forEach((b,i)=>b.classList.toggle('selected',i===s.difficulty));
-document.querySelectorAll('.piece').forEach((b,i)=>b.classList.toggle('selected',i===s.piece));
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading) return;
+        reloading = true;
+        location.reload();
+      });
 
-const bb=$('botsButtons');bb.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='bot'+(s.bots===i?' selected':'');b.textContent=i;b.onclick=()=>{s.bots=i;save();render();note(i+' '+(i===1?'bot':'bots'))};bb.appendChild(b)}
-$('players').innerHTML='Total de jogadores na partida: '+(s.bots+1)+'<br>(Você + '+s.bots+' '+(s.bots===1?'BOT':'BOTS')+')';
+      window.addEventListener('load', async () => {
+        try {
+          const reg = await navigator.serviceWorker.register('/sw.js', {
+            updateViaCache: 'none'
+          });
 
-const m=maps[s.map];$('mapPreview').style.background=m.theme;$('mapPreview').querySelector('.scene').textContent=m.name;$('mapName').textContent=m.name;$('mapDesc').textContent=m.desc;
-$('durVal').textContent=durations[s.dur].v;$('durDesc').textContent=durations[s.dur].d;
-$('moneyVal').textContent=money[s.money].v;$('moneyDesc').textContent=money[s.money].d;
-$('buildVal').textContent=builds[s.build].v;$('buildDesc').textContent=builds[s.build].d;
-$('tradeDesc').textContent=s.trades?'Permite trocar propriedades com outros jogadores.':'Trocas entre jogadores desativadas.';
-$('auctionDesc').textContent=s.auctions?'Ativa leilões de propriedades não compradas.':'Propriedades recusadas não entram em leilão.';
-$('eventDesc').textContent=s.events?'Usar cartas de chance e baú de Nerdora.':'Partida sem cartas de evento aleatórias.';
-[['trade','trades'],['auction','auctions'],['event','events']].forEach(([id,k])=>$(id).classList.toggle('off',!s[k]));
-}
-function show(c,push=false){art.src=c?CONFIG:MENU;play.hidden=c;cfg.classList.toggle('on',c);if(c)render();if(push)history.pushState({c},'',c?'#configuracao':location.pathname)}
-new Image().src=CONFIG;
-play.onclick=()=>show(true,true);
-$('back').onclick=()=>location.hash==='#configuracao'?history.back():show(false);
-document.querySelectorAll('.diff').forEach((b,i)=>b.onclick=()=>{s.difficulty=i;save();render();note('Dificuldade: '+diffNames[i])});
-document.querySelectorAll('.piece').forEach((b,i)=>b.onclick=()=>{s.piece=i;save();render();note('Peça '+(i+1)+' selecionada')});
-$('mapPrev').onclick=()=>{cycle('map',maps,-1);note(maps[s.map].name)};$('mapNext').onclick=()=>{cycle('map',maps,1);note(maps[s.map].name)};$('changeMap').onclick=()=>{cycle('map',maps,1);note(maps[s.map].name)};
-$('durPrev').onclick=()=>cycle('dur',durations,-1);$('durNext').onclick=()=>cycle('dur',durations,1);
-$('moneyPrev').onclick=()=>cycle('money',money,-1);$('moneyNext').onclick=()=>cycle('money',money,1);
-$('buildPrev').onclick=()=>cycle('build',builds,-1);$('buildNext').onclick=()=>cycle('build',builds,1);
-function tog(k,l){s[k]=!s[k];save();render();note(l+': '+(s[k]?'ativado':'desativado'))}
-$('trade').onclick=()=>tog('trades','Trocas');$('auction').onclick=()=>tog('auctions','Leilões');$('event').onclick=()=>tog('events','Cartas');
-window.addEventListener('popstate',()=>show(location.hash==='#configuracao'));window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);fit();show(location.hash==='#configuracao');
-async function immersive(){try{if(screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(_){}try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(_){}}
-document.addEventListener('pointerdown',immersive,{once:true,passive:true});
-if('serviceWorker'in navigator){let re=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(re)return;re=true;location.reload()});window.addEventListener('load',async()=>{try{const r=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});await r.update();const u=()=>r.update().catch(()=>{});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){u();fit();immersive()}});window.addEventListener('focus',()=>{u();fit();immersive()})}catch(_){}})}
-})();
-</script>
+          await reg.update();
+
+          const checkUpdate = () => reg.update().catch(() => {});
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              checkUpdate();
+              tryImmersive();
+            }
+          });
+          window.addEventListener('focus', () => {
+            checkUpdate();
+            tryImmersive();
+          });
+        } catch (_) {}
+      });
+    })();
+  </script>
 </body>
 </html>
