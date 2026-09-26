@@ -1,4 +1,4 @@
-const CACHE='nerdopoles-v0.8-board-start';
+const CACHE='nerdopoles-v0.9-live-board';
 const APP_SHELL=['/','/index.html','/manifest.webmanifest','/icons/icon.svg','/assets/nerdopoles-menu.jpg','/assets/nerdopoles-config.jpg','/assets/nerdopoles-board-01.png'];
 
 self.addEventListener('install',event=>{
