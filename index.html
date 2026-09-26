@@ -76,8 +76,8 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .toggleDesc{position:absolute;left:78.8%;width:13.9%;z-index:21;color:#bdc8ff;font-size:clamp(5.5px,.62vw,9px);line-height:1.05;pointer-events:none}
 #tradeDesc{top:56.2%}#auctionDesc{top:64.0%}#eventDesc{top:71.7%}
 
-/* iniciar continua sem função */
-#startBlock{position:absolute;left:43.1%;top:78.0%;width:31.7%;height:16.0%;z-index:25;background:transparent}
+/* iniciar partida */
+#start{position:absolute;left:43.1%;top:78.0%;width:31.7%;height:16.0%;z-index:25;background:transparent;border:0;cursor:pointer}
 
 #toast{position:absolute;left:50%;bottom:2.1%;transform:translate(-50%,12px);z-index:35;background:rgba(8,10,34,.96);border:1px solid #b16dff;color:#fff;padding:.4rem .75rem;border-radius:999px;font-weight:700;font-size:clamp(7px,.85vw,12px);opacity:0;transition:.16s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -129,7 +129,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 <button id="auction" class="toggle" type="button"></button><div id="auctionDesc" class="toggleDesc"></div>
 <button id="event" class="toggle" type="button"></button><div id="eventDesc" class="toggleDesc"></div>
 
-<div id="startBlock"></div>
+<button id="start" class="hot" type="button" aria-label="Iniciar partida"></button>
 <div id="toast"></div>
 </div>
 </div>
@@ -139,7 +139,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 
 <script>
 (()=>{
-const MENU='/assets/nerdopoles-menu.jpg',CONFIG='/assets/nerdopoles-config.jpg';
+const MENU='/assets/nerdopoles-menu.jpg',CONFIG='/assets/nerdopoles-config.jpg',BOARD='/assets/nerdopoles-board-01.png';
 const difficulties=['Fácil','Normal','Difícil','Lendário'];
 const pieces=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
 const maps=[
@@ -167,7 +167,9 @@ let s={...defaults};
 try{Object.assign(s,JSON.parse(localStorage.getItem('nerdopoles-config')||'{}'))}catch(_){}
 const $=id=>document.getElementById(id),stage=$('stage'),frame=$('frame'),art=$('art'),play=$('play'),cfg=$('config'),toast=$('toast');
 let timer;
-function fit(){const w=stage.clientWidth,h=stage.clientHeight,r=16/9;if(!w||!h)return;let fw=w,fh=fw/r;if(fh>h){fh=h;fw=fh*r}frame.style.width=fw+'px';frame.style.height=fh+'px'}
+let currentRatio=16/9;
+function fit(){const w=stage.clientWidth,h=stage.clientHeight,r=currentRatio||16/9;if(!w||!h)return;let fw=w,fh=fw/r;if(fh>h){fh=h;fw=fh*r}frame.style.width=fw+'px';frame.style.height=fh+'px'}
+function setArtwork(src,ratio){currentRatio=ratio;art.src=src;fit()}
 function save(){try{localStorage.setItem('nerdopoles-config',JSON.stringify(s))}catch(_){}}
 function note(t){toast.textContent=t;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),900)}
 function cycle(k,a,d){s[k]=(s[k]+d+a.length)%a.length;save();render()}
@@ -186,9 +188,11 @@ $('auctionDesc').textContent=s.auctions?'Propriedades recusadas vão a leilão.'
 $('eventDesc').textContent=s.events?'Cartas aleatórias entram na partida.':'Partida sem cartas de evento.';
 $('trade').classList.toggle('off',!s.trades);$('auction').classList.toggle('off',!s.auctions);$('event').classList.toggle('off',!s.events);
 }
-function showConfig(push=false){art.src=CONFIG;play.hidden=true;cfg.classList.add('on');render();if(push)history.pushState({screen:'config'},'','#configuracao')}
-function showMenu(){art.src=MENU;play.hidden=false;cfg.classList.remove('on')}
+function showConfig(push=false){setArtwork(CONFIG,16/9);play.hidden=true;cfg.classList.add('on');render();if(push)history.pushState({screen:'config'},'','#configuracao')}
+function showMenu(push=false){setArtwork(MENU,16/9);play.hidden=false;cfg.classList.remove('on');if(push)history.pushState({screen:'menu'},'',location.pathname)}
+function showBoard(push=false){setArtwork(BOARD,1536/691);play.hidden=true;cfg.classList.remove('on');if(push)history.pushState({screen:'board'},'','#tabuleiro')}
 new Image().src=CONFIG;
+new Image().src=BOARD;
 play.addEventListener('click',()=>showConfig(true));
 $('back').addEventListener('click',()=>location.hash==='#configuracao'?history.back():showMenu());
 document.querySelectorAll('.diff').forEach((b,i)=>b.addEventListener('click',()=>{s.difficulty=i;save();render();note('Dificuldade: '+difficulties[i])}));
@@ -200,8 +204,9 @@ $('moneyPrev').onclick=()=>cycle('money',money,-1);$('moneyNext').onclick=()=>cy
 $('buildPrev').onclick=()=>cycle('build',builds,-1);$('buildNext').onclick=()=>cycle('build',builds,1);
 function tog(k,label){s[k]=!s[k];save();render();note(label+': '+(s[k]?'ativado':'desativado'))}
 $('trade').onclick=()=>tog('trades','Trocas');$('auction').onclick=()=>tog('auctions','Leilões');$('event').onclick=()=>tog('events','Cartas de evento');
-window.addEventListener('popstate',()=>location.hash==='#configuracao'?showConfig(false):showMenu());
-window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);fit();if(location.hash==='#configuracao')showConfig(false);
+$('start').onclick=()=>showBoard(true);
+window.addEventListener('popstate',()=>{if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false)});
+window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);fit();if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false);
 async function immersive(){try{if(screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(_){}try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(_){}}
 document.addEventListener('pointerdown',immersive,{once:true,passive:true});
 if('serviceWorker'in navigator){let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});await reg.update();const update=()=>reg.update().catch(()=>{});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){update();fit();immersive()}});window.addEventListener('focus',()=>{update();fit();immersive()})}catch(_){}})}
