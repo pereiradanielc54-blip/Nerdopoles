@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#05050b">
+  <meta name="theme-color" content="#090012">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,13 @@
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <style>
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#000}
+    html,body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:#050008;
+    }
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       overscroll-behavior:none;
@@ -25,14 +31,30 @@
       inset:0;
       width:100vw;
       height:100dvh;
+      min-height:100svh;
       overflow:hidden;
-      background:#000;
       display:grid;
       place-items:center;
+      background:
+        radial-gradient(ellipse at 0% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
+        radial-gradient(ellipse at 100% 50%, rgba(147,35,255,.62) 0%, rgba(99,16,185,.32) 24%, rgba(29,3,48,.16) 48%, transparent 68%),
+        #050008;
+    }
+    .visual-stage{
+      position:absolute;
+      top:env(safe-area-inset-top,0px);
+      right:env(safe-area-inset-right,0px);
+      bottom:env(safe-area-inset-bottom,0px);
+      left:env(safe-area-inset-left,0px);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
     }
     .menu-art{
       width:100%;
       height:100%;
+      max-width:100%;
+      max-height:100%;
       display:block;
       object-fit:contain;
       object-position:center;
@@ -48,7 +70,9 @@
       place-items:center;
       padding:28px;
       text-align:center;
-      background:#080819;
+      background:
+        radial-gradient(circle at 50% 36%, rgba(116,36,212,.34), transparent 44%),
+        #080819;
       color:#fff;
     }
     .rotate-card{
@@ -69,16 +93,19 @@
 </head>
 <body>
   <main id="app" aria-label="Menu principal do Nerdópoles">
-    <img
-      class="menu-art"
-      src="/assets/nerdopoles-menu.jpg"
-      alt="Menu principal oficial do Nerdópoles"
-      width="1536"
-      height="864"
-      draggable="false"
-      fetchpriority="high"
-      decoding="sync"
-    >
+    <section class="visual-stage" aria-label="Arte oficial do menu">
+      <img
+        class="menu-art"
+        src="/assets/nerdopoles-menu.jpg"
+        alt="Menu principal oficial do Nerdópoles"
+        width="1536"
+        height="864"
+        draggable="false"
+        fetchpriority="high"
+        decoding="sync"
+      >
+    </section>
+
     <section class="rotate-lock" aria-live="polite">
       <div class="rotate-card">
         <div class="rotate-icon">📱↔️</div>
@@ -90,6 +117,29 @@
 
   <script>
     (() => {
+      const tryImmersive = async () => {
+        try {
+          if (screen.orientation?.lock) await screen.orientation.lock('landscape');
+        } catch (_) {}
+
+        try {
+          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+          }
+        } catch (_) {}
+      };
+
+      // Em uma PWA instalada com display: fullscreen, o Android já abre sem
+      // barras do navegador/status. Em navegador comum, a API exige gesto do usuário.
+      window.addEventListener('pageshow', () => {
+        if (window.matchMedia('(display-mode: fullscreen)').matches) {
+          tryImmersive();
+        }
+      });
+
+      document.addEventListener('pointerdown', tryImmersive, { once:true, passive:true });
+      document.addEventListener('touchstart', tryImmersive, { once:true, passive:true });
+
       if (!('serviceWorker' in navigator)) return;
 
       let reloading = false;
@@ -109,9 +159,15 @@
 
           const checkUpdate = () => reg.update().catch(() => {});
           document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') checkUpdate();
+            if (document.visibilityState === 'visible') {
+              checkUpdate();
+              tryImmersive();
+            }
           });
-          window.addEventListener('focus', checkUpdate);
+          window.addEventListener('focus', () => {
+            checkUpdate();
+            tryImmersive();
+          });
         } catch (_) {}
       });
     })();
