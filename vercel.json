@@ -28,7 +28,7 @@
       ]
     },
     {
-      "source": "/assets/:path*",
+      "source": "/assets/nerdopoles-menu.jpg",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }
       ]
