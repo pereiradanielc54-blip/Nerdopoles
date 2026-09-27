@@ -28,6 +28,7 @@ var S=[
 ['Baú de Nerdora','chest'],
 ['Arena dos Aventureiros','prop',180,'orange',14],
 ['Descanso Livre','free'],
+['Arena dos Aventureiros','prop',200,'orange',16],
 ['Grande Mercado de Nerdora','prop',200,'orange',16],
 ['Praça do Nyan','prop',220,'nyan',18],
 ['Distrito dos Guerreiros','prop',220,'red',18],
@@ -49,7 +50,7 @@ var S=[
 ['Taxa Imperial','tax',100],
 ['Castelo de Nerdora','prop',400,'darkblue',50]
 ];
-var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,20],nyan:[21],red:[22,24,25],yellow:[27,29,30],green:[32,34],darkblue:[37,39]};
+var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,20,21],nyan:[22],red:[23,25,26],yellow:[28,30,31],green:[33,35],darkblue:[38,40]};
 var HOUSE_COST={brown:50,lightblue:50,pink:100,orange:100,nyan:150,red:150,yellow:150,green:200,darkblue:200};
 var EVENT_CARDS=[
 ['Portal Dourado','Volte ao Portal de Nerdora e receba 200 N.','start'],
@@ -59,7 +60,7 @@ var EVENT_CARDS=[
 ['Encontro com Dragão','Sua caravana foi danificada. Pague 100 N.','-100'],
 ['Selo de Fuga','Guarde uma Chave do Calabouço.','key'],
 ['Festival do Nyan','Cada rival paga 30 N para participar da festa.','each30'],
-['Chamado Dimensional','Avance até o Portal Dimensional.','p35'],
+['Chamado Dimensional','Avance até o Portal Dimensional.','portal'],
 ['Guilda dos Heróis','Sua equipe venceu um contrato. Receba 100 N.','+100'],
 ['Tempestade Arcana','Pague 25 N por cada construção que possuir.','repairs25']
 ];
@@ -76,27 +77,35 @@ var CHEST_CARDS=[
 ['Taxa da Guilda','Pague 40 N de contribuição anual.','-40']
 ];
 
-var positions=[
-[13.2,17.8],
-[21.4,18.4],[27.5,18.4],[33.9,18.4],[40.2,18.4],[46.6,18.4],[53.0,18.4],[59.2,18.4],[65.3,18.4],[71.8,18.4],
-[87.1,17.8],
-[91.2,24.5],[91.6,30.8],[92.0,37.5],[92.2,44.3],[91.8,51.2],[92.0,58.4],[92.0,65.8],[91.8,71.9],
-[94.2,91.2],
-[77.5,92.7],[71.2,92.7],[65.0,92.7],[59.2,92.7],[52.8,92.7],[46.8,92.7],[40.6,92.7],[34.0,92.7],[27.8,92.7],[21.7,92.7],[16.4,92.7],
-[6.0,91.0],
-[12.2,74.5],[12.2,69.5],[12.2,62.0],[12.4,54.6],[12.4,47.5],[12.4,40.0],[12.5,32.4],[12.5,25.3]
+var CELL_RECTS=[
+[8.556,8.323,17.380,18.430],
+[18.984,8.323,24.332,18.430],[25.455,8.323,30.749,18.430],[31.925,8.323,37.861,18.430],[39.091,8.323,44.385,18.430],[45.668,8.323,51.390,18.430],[52.620,8.323,58.289,18.430],[59.519,8.323,64.706,18.430],[65.882,8.323,71.230,18.430],[72.406,8.323,79.572,18.430],
+[82.086,8.323,92.781,18.430],
+[83.690,19.382,94.545,24.970],[83.850,26.635,94.652,31.986],[84.064,33.888,94.759,39.120],[84.225,41.141,94.866,46.373],[84.225,48.395,94.866,53.983],[84.225,55.886,94.866,61.356],[84.225,63.377,94.866,68.966],[84.225,70.868,94.866,77.051],
+[87.701,80.856,97.861,92.747],
+[80.749,78.478,85.829,92.747],[74.064,78.478,79.679,92.747],[67.647,78.478,72.995,92.747],[61.337,78.478,66.631,92.747],[56.043,78.478,60.321,92.747],[50.107,78.478,55.080,92.747],[44.171,78.478,48.984,92.747],[37.647,78.478,43.048,92.747],[31.283,78.478,36.524,92.747],[25.241,78.478,30.160,92.747],[18.770,78.478,24.118,92.747],[12.139,78.478,17.647,92.747],
+[1.872,78.478,10.428,92.747],
+[6.150,68.133,14.706,74.792],[6.417,61.118,14.866,66.350],[6.684,54.102,14.973,59.334],[6.952,47.206,15.080,52.319],[7.219,40.190,15.241,45.303],[7.487,33.294,15.401,38.407],[7.754,26.278,15.508,31.391],[8.021,19.263,15.775,24.376]
 ],i;
 
-var PLAYER_SLOTS={
-  top:[[-1.55,-.15],[0,-.15],[1.55,-.15],[-1.55,1.25],[0,1.25],[1.55,1.25]],
-  right:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]],
-  bottom:[[-1.55,-1.15],[0,-1.15],[1.55,-1.15],[-1.55,.55],[0,.55],[1.55,.55]],
-  left:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]]
-};
-function houseSide(idx){return idx<=10?'top':idx<=19?'right':idx<=30?'bottom':'left'}
+var PLAYER_SLOT_LAYOUT=[
+[0.23,0.62],[0.50,0.62],[0.77,0.62],
+[0.23,0.90],[0.50,0.90],[0.77,0.90]
+];
+
+var positions=CELL_RECTS.map(function(r){
+  return [(r[0]+r[2])/2,(r[1]+r[3])/2];
+});
+
 function playerBase(idx,playerId){
-  var base=positions[idx]||positions[0],slots=PLAYER_SLOTS[houseSide(idx)],o=slots[(Number(playerId)||0)%slots.length];
-  return [base[0]+o[0],base[1]+o[1]];
+  var r=CELL_RECTS[idx]||CELL_RECTS[0];
+  var o=PLAYER_SLOT_LAYOUT[(Number(playerId)||0)%PLAYER_SLOT_LAYOUT.length];
+  return [r[0]+(r[2]-r[0])*o[0],r[1]+(r[3]-r[1])*o[1]];
+}
+function propertyMarker(idx,type){
+  var r=CELL_RECTS[idx]||CELL_RECTS[0];
+  var f=type==='owner'?.16:.84;
+  return [r[0]+(r[2]-r[0])*f,r[1]+(r[3]-r[1])*.88];
 }
 
 var game=null,root=null,logs=[],moving=false,pieceSprites=['./assets/tokens/token-0.png','./assets/tokens/token-1.png','./assets/tokens/token-2.png','./assets/tokens/token-3.png','./assets/tokens/token-4.png','./assets/tokens/token-5.png'];
@@ -129,7 +138,7 @@ function mount(){
   '</section>'+
   '<div id="ngModal"><div class="ng-modal-card"><div id="ngModalTitle" class="ng-modal-title"></div><div id="ngModalBody" class="ng-modal-body"></div><div id="ngModalActions" class="ng-modal-actions"></div></div></div>';
   frame.appendChild(d);root=d;
-  for(i=0;i<40;i++){var q=document.createElement('div');q.className='ng-slot';q.style.left=positions[i][0]+'%';q.style.top=positions[i][1]+'%';document.getElementById('ngSlots').appendChild(q)}
+  for(i=0;i<S.length;i++){var q=document.createElement('div');q.className='ng-slot';q.style.left=positions[i][0]+'%';q.style.top=positions[i][1]+'%';document.getElementById('ngSlots').appendChild(q)}
   bind();
 }
 
@@ -151,7 +160,7 @@ async function normalizeGameState(g){
   if(!g||!Array.isArray(g.p))return g;
   var used={};
   g.p.forEach(function(p,idx){
-    if(typeof p.pos!=='number'||p.pos<0||p.pos>39)p.pos=0;
+    if(typeof p.pos!=='number'||p.pos<0||p.pos>=S.length)p.pos=0;
     var piece=Number.isInteger(p.piece)?p.piece:FALLBACK.indexOf(p.e);
     if(piece<0||piece>5||used[piece]){
       var available=[0,1,2,3,4,5].filter(function(n){return !used[n]});
@@ -161,7 +170,7 @@ async function normalizeGameState(g){
     if(!p.c)p.c=COLORS[idx%COLORS.length];
   });
   if(typeof g.bonusRoll!=='boolean')g.bonusRoll=false;
-  g.version=4;
+  g.version=5;
   return g;
 }
 
@@ -170,7 +179,7 @@ function newGame(){
   var colors=shuffle(COLORS.slice()),avail=[0,1,2,3,4,5].filter(function(n){return n!==chosen});shuffle(avail);
   var ps=[player(0,'Você',chosen,colors[0],money)];
   for(var n=1;n<=b;n++)ps.push(player(n,'BOT '+n,avail[(n-1)%avail.length],colors[n%colors.length],money));
-  return {version:4,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,bonusRoll:false,a:{},created:Date.now()};
+  return {version:5,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,bonusRoll:false,a:{},created:Date.now()};
 }
 function player(id,name,piece,color,money){return{id:id,n:name,piece:piece,c:color,m:money,pos:0,props:[],jail:false,jt:0,key:0,dead:false,dbl:0}}
 
@@ -180,7 +189,7 @@ async function start(){
 }
 function resume(){
   mount();try{game=JSON.parse(localStorage.getItem('nerdopoles-game')||'null')}catch(e){game=null}
-  if(!game||Number(game.version||0)<4)game=newGame();game=normalizeGameState(game);root.classList.add('on');render();
+  if(!game||Number(game.version||0)<5)game=newGame();game=normalizeGameState(game);root.classList.add('on');render();
   if(game.t!==0&&game.phase==='roll')setTimeout(botTurn,900);
 }
 function hide(){if(root)root.classList.remove('on')}
@@ -218,7 +227,7 @@ function renderTokens(){
     var src=pieceSprites[p.piece];
     if(src){
       var im=document.createElement('img');
-      im.src=src+'?v=104';
+      im.src=src+'?v=122';
       im.alt=PIECE_NAMES[p.piece]||'Peça Nerdópoles';
       im.decoding='async';
       im.onload=function(){fallback.style.opacity='0'};
@@ -232,9 +241,9 @@ function renderOwners(){
   if(!game)return;var e=document.getElementById('ngOwners');if(!e)return;e.innerHTML='';
   Object.keys(game.a).forEach(function(k){
     var a=game.a[k];if(a.owner==null)return;var idx=Number(k),p=game.p[a.owner],flag=document.createElement('div');
-    flag.className='ng-owner-flag';flag.style.left='calc('+positions[idx][0]+'% - .85cqw)';flag.style.top='calc('+positions[idx][1]+'% + .78cqw)';flag.style.setProperty('--c',p.c);e.appendChild(flag);
+    var op=propertyMarker(idx,'owner');flag.className='ng-owner-flag';flag.style.left=op[0]+'%';flag.style.top=op[1]+'%';flag.style.setProperty('--c',p.c);e.appendChild(flag);
     if(a.h){
-      var b=document.createElement('div');b.className='ng-buildings';b.style.left='calc('+positions[idx][0]+'% + .78cqw)';b.style.top='calc('+positions[idx][1]+'% + .78cqw)';b.style.setProperty('--owner',p.c);
+      var bp=propertyMarker(idx,'build');var b=document.createElement('div');b.className='ng-buildings';b.style.left=bp[0]+'%';b.style.top=bp[1]+'%';b.style.setProperty('--owner',p.c);
       if(a.h>=5){var hotel=document.createElement('i');hotel.className='ng-hotel-mini';b.appendChild(hotel)}
       else for(var h=0;h<a.h;h++){var house=document.createElement('i');house.className='ng-house-mini';b.appendChild(house)}
       e.appendChild(b);
@@ -361,7 +370,7 @@ async function doRoll(pi,bot){
 async function move(pi,n){
   var p=game.p[pi];
   for(var k=0;k<n;k++){
-    p.pos=(p.pos+1)%40;
+    p.pos=(p.pos+1)%S.length;
     if(p.pos===0){p.m+=200;log(p.n+' passou pelo Portal e recebeu 200 N.')}
     renderTokens();renderHud();await delay(230);
   }
@@ -500,12 +509,12 @@ async function effect(e,pi){
   var p=game.p[pi];
   if(e==='start'){p.pos=0;p.m+=200}
   else if(e==='jail')jail(pi);
-  else if(e==='back3'){p.pos=(p.pos+37)%40;renderTokens()}
+  else if(e==='back3'){p.pos=(p.pos-3+S.length)%S.length;renderTokens()}
   else if(e==='+150')p.m+=150;else if(e==='+200')p.m+=200;else if(e==='+100')p.m+=100;else if(e==='+50')p.m+=50;else if(e==='+75')p.m+=75;
   else if(e==='-100')pay(pi,100,null);else if(e==='-50')pay(pi,50,null);else if(e==='-40')pay(pi,40,null);
   else if(e==='key')p.key++;
   else if(e==='each30'||e==='each20'){var v=e==='each30'?30:20;game.p.forEach(function(q,j){if(j!==pi&&!q.dead){var x=Math.min(q.m,v);q.m-=x;p.m+=x}})}
-  else if(e==='p35'){var steps=(35-p.pos+40)%40;await move(pi,steps)}
+  else if(e==='portal'){var target=36,steps=(target-p.pos+S.length)%S.length;await move(pi,steps)}
   else if(e==='repairs25'){var buildings=p.props.reduce(function(sum,idx){var a=game.a[idx];return sum+(a?a.h||0:0)},0);if(buildings)pay(pi,buildings*25,null)}
   render();
 }
