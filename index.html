@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nerdópoles">
-<title>Nerdópoles</title>
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<title>Nerdópoles — Preview Interno</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#050008}
@@ -103,7 +103,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 </section>
 <section id="stage" class="stage">
 <div id="frame" class="frame">
-<img id="art" class="art" src="/assets/nerdopoles-menu.jpg" width="1536" height="864" draggable="false" fetchpriority="high" decoding="sync">
+<img id="art" class="art" src="./assets/nerdopoles-menu.jpg" width="1536" height="864" draggable="false" fetchpriority="high" decoding="sync">
 <button id="play" class="hot" type="button" aria-label="Jogar"></button>
 
 <div id="config">
@@ -153,7 +153,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 
 <script>
 (()=>{
-const MENU='/assets/nerdopoles-menu.jpg',CONFIG='/assets/nerdopoles-config.jpg',BOARD='/assets/nerdopoles-board-01.png';
+const MENU='./assets/nerdopoles-menu.jpg',CONFIG='./assets/nerdopoles-config.jpg',BOARD='./assets/nerdopoles-board-01.png';
 const difficulties=['Fácil','Normal','Difícil','Lendário'];
 const pieces=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
 const maps=[
@@ -236,10 +236,10 @@ if('serviceWorker'in navigator){
   window.addEventListener('load',async()=>{
     try{
       if(bootStatus)bootStatus.textContent='Verificando atualizações...';
-      const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+      const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
       let serverVersion=null;
       try{
-        const vr=await fetch('/version.json?cold='+Date.now(),{cache:'no-store'});
+        const vr=await fetch('./version.json?cold='+Date.now(),{cache:'no-store'});
         if(vr.ok)serverVersion=(await vr.json()).version||null;
       }catch(_){}
       const previous=localStorage.getItem('nerdopoles-app-version');
@@ -261,13 +261,13 @@ if('serviceWorker'in navigator){
 })();
 </script>
 
-<link rel="stylesheet" href="/board-v2.css?v=106">
-<link rel="stylesheet" href="/room-v1.css?v=111">
-<link rel="stylesheet" href="/online-board-v1.css?v=111">
-<script src="/vendor/peerjs.min.js?v=155" defer></script>
-<script src="/board-v2.js?v=106" defer></script>
-<script src="/online-board-v1.js?v=111" defer></script>
-<script src="/room-v1.js?v=111" defer></script>
+<link rel="stylesheet" href="./board-v2.css?v=106">
+<link rel="stylesheet" href="./room-v1.css?v=111">
+<link rel="stylesheet" href="./online-board-v1.css?v=111">
+<script src="./vendor/peerjs.min.js?v=155" defer></script>
+<script src="./board-v2.js?v=106" defer></script>
+<script src="./online-board-v1.js?v=111" defer></script>
+<script src="./room-v1.js?v=111" defer></script>
 
 </body>
 </html>
