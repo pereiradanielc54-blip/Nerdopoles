@@ -1,4 +1,4 @@
-const CACHE='nerdopoles-preview-1.2.2-cell-anchors';
+const CACHE='nerdopoles-preview-1.2.3-n-anchor';
 const APP_SHELL=['./assets/nerdopoles-lobby.png','./assets/nerdopoles-create-room.png','./vendor/peerjs.min.js','./online-board-v1.js','./online-board-v1.css','./room-v1.js','./room-v1.css','./version.json','./assets/tokens/token-0.png','./assets/tokens/token-1.png','./assets/tokens/token-2.png','./assets/tokens/token-3.png','./assets/tokens/token-4.png','./assets/tokens/token-5.png','./board-v2.css','./board-v2.js','./assets/nerdopoles-pieces.png','./','./index.html','./manifest.webmanifest','./icons/icon.svg','./assets/nerdopoles-menu.jpg','./assets/nerdopoles-config.jpg','./assets/nerdopoles-board-01.png'];
 
 self.addEventListener('install',event=>{
