@@ -113,7 +113,8 @@ async function normalizeGameState(g){
     p.piece=piece;used[piece]=true;
     if(!p.c)p.c=COLORS[idx%COLORS.length];
   });
-  g.version=2;
+  if(typeof g.bonusRoll!=='boolean')g.bonusRoll=false;
+  g.version=3;
   return g;
 }
 
@@ -122,7 +123,7 @@ function newGame(){
   var colors=shuffle(COLORS.slice()),avail=[0,1,2,3,4,5].filter(function(n){return n!==chosen});shuffle(avail);
   var ps=[player(0,'Você',chosen,colors[0],money)];
   for(var n=1;n<=b;n++)ps.push(player(n,'BOT '+n,avail[(n-1)%avail.length],colors[n%colors.length],money));
-  return {version:2,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,a:{},created:Date.now()};
+  return {version:3,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,bonusRoll:false,a:{},created:Date.now()};
 }
 function player(id,name,piece,color,money){return{id:id,n:name,piece:piece,c:color,m:money,pos:0,props:[],jail:false,jt:0,key:0,dead:false,dbl:0}}
 
@@ -216,7 +217,7 @@ function renderHud(){
 }
 function tip(human,pending){
   if(!human)return 'Os bots estão decidindo. Observe as compras, aluguéis e construções.';
-  if(game.phase==='roll')return 'Role os dados. Duplas dão outra jogada; três duplas seguidas levam ao Calabouço.';
+  if(game.phase==='roll')return game.p[game.t].dbl>0?'Dupla! As ações da casa foram resolvidas. Agora role os dados novamente.':'Role os dados. Duplas dão outra jogada; três duplas seguidas levam ao Calabouço.';
   if(pending)return game.c.auctions!==false?'Compre a propriedade ou mande-a para leilão.':'Você pode comprar ou recusar a propriedade.';
   if(buildable(0).length)return 'Você já pode construir em um grupo completo. Casas aparecem no tabuleiro com a sua cor.';
   return 'Use suas propriedades, hipotecas e negociações antes de encerrar o turno.';
@@ -260,11 +261,11 @@ async function doRoll(pi,bot){
   if(p.jail){
     if(a===b){p.jail=false;p.jt=0;log(p.n+' saiu do Calabouço com uma dupla.');await move(pi,sum);await land(pi,sum,bot,false)}
     else{p.jt++;if(p.jt>=3){pay(pi,50,null);p.jail=false;p.jt=0;await move(pi,sum);await land(pi,sum,bot,false)}else{game.phase='end';render();if(bot)setTimeout(endTurn,900)}}
-    moving=false;return;
+    moving=false;render();return;
   }
   if(a===b){p.dbl++;log('Dupla! '+p.n+' poderá jogar novamente.');if(p.dbl>=3){jail(pi);moving=false;if(bot)setTimeout(endTurn,900);return}}
   else p.dbl=0;
-  await move(pi,sum);await delay(420);await land(pi,sum,bot,a===b);moving=false;
+  await move(pi,sum);await delay(420);await land(pi,sum,bot,a===b);moving=false;render();
 }
 async function move(pi,n){
   var p=game.p[pi];
@@ -285,7 +286,7 @@ async function land(pi,dice,bot,dbl){
       else if(game.c.auctions!==false)autoAuction(idx,pi);
       finish(pi,bot,dbl);return;
     }
-    game.pending=idx;game.phase='decide';render();return;
+    game.pending=idx;game.bonusRoll=!!(dbl&&!p.jail);game.phase='decide';render();return;
   }
   if(s[1]==='tax'){pay(pi,s[2],null);finish(pi,bot,dbl);return}
   if((s[1]==='event'||s[1]==='chest')&&game.c.events!==false){await card(s[1],pi,bot);finish(pi,bot,dbl);return}
@@ -293,7 +294,7 @@ async function land(pi,dice,bot,dbl){
   finish(pi,bot,dbl);
 }
 function finish(pi,bot,dbl){
-  var p=game.p[pi];game.phase=(dbl&&!p.jail)?'roll':'end';render();
+  var p=game.p[pi];game.bonusRoll=false;game.phase=(dbl&&!p.jail)?'roll':'end';render();
   if(bot)setTimeout(function(){botBuild(pi);if(game.phase==='roll')botTurn();else endTurn()},950);
 }
 
@@ -301,7 +302,13 @@ function buySpace(pi,idx){
   var p=game.p[pi],s=S[idx];if(p.m<s[2])return false;
   p.m-=s[2];p.props.push(idx);game.a[idx]={owner:pi,h:0,mort:false};renderOwners();render();return true;
 }
-function buy(){if(game.pending==null)return;if(buySpace(0,game.pending)){log('Você comprou <b>'+S[game.pending][0]+'</b>.');game.pending=null;game.phase='end';render()}}
+function resolveLandingDecision(){
+  var extra=!!game.bonusRoll&&!game.p[0].jail;
+  game.pending=null;game.bonusRoll=false;game.phase=extra?'roll':'end';
+  if(extra)log('<b>Dupla resolvida:</b> conclua suas ações e role os dados novamente.');
+  render();
+}
+function buy(){if(game.pending==null)return;var idx=game.pending;if(buySpace(0,idx)){log('Você comprou <b>'+S[idx][0]+'</b>.');resolveLandingDecision()}}
 
 function rent(idx,dice){
   var s=S[idx],a=game.a[idx],owner=a.owner;
@@ -326,12 +333,12 @@ function jail(pi){var p=game.p[pi];p.pos=10;p.jail=true;p.jt=0;p.dbl=0;game.phas
 function endOrDecline(){
   if(game.phase==='decide'&&game.pending!=null){
     if(game.c.auctions!==false){auction();return}
-    log('Você recusou '+S[game.pending][0]+'.');game.pending=null;game.phase='end';render();return;
+    log('Você recusou '+S[game.pending][0]+'.');resolveLandingDecision();return;
   }
   endTurn();
 }
 function endTurn(){
-  if(!game)return;game.pending=null;var next=game.t,wrap=false;
+  if(!game)return;game.pending=null;game.bonusRoll=false;var next=game.t,wrap=false;
   do{next=(next+1)%game.p.length;if(next===0)wrap=true}while(game.p[next].dead);
   game.t=next;if(wrap)game.r++;game.phase='roll';game.p[next].dbl=0;render();
   if(!winner()&&game.t!==0)setTimeout(botTurn,950);
@@ -373,7 +380,7 @@ function auction(){
   for(var j=1;j<game.p.length;j++){if(game.p[j].dead)continue;var b=Math.min(game.p[j].m,Math.floor(s[2]*(.65+Math.random()*.55)/10)*10);if(b>best.b)best={pi:j,b:b}}
   if(best.b>0){game.p[best.pi].m-=best.b;game.p[best.pi].props.push(idx);game.a[idx]={owner:best.pi,h:0,mort:false};log(game.p[best.pi].n+' venceu o leilão por '+cash(best.b)+'.')}
   else log('Ninguém fez oferta por '+s[0]+'.');
-  game.pending=null;game.phase='end';render();
+  resolveLandingDecision();
 }
 function autoAuction(idx,skip){
   var s=S[idx],best={pi:-1,b:0};
