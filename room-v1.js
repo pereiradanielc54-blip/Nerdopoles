@@ -394,7 +394,7 @@ function renderLobby(){
   room.players.forEach(function(p){if(p.piece!=null)occupied[p.piece]=p.peerId});
   document.querySelectorAll('.lobby-piece').forEach(function(b){
     var piece=Number(b.dataset.i),owner=occupied[piece];
-    b.classList.toggle('occupied',!!owner&&owner!==selfId);
+    b.classList.toggle('occupied',!!owner);
     b.classList.toggle('mine',owner===selfId);
   });
 
@@ -402,8 +402,8 @@ function renderLobby(){
   var complete=room.players.length===room.config.maxPlayers&&room.players.every(function(p){return p.piece!=null});
   $('roomLobbyInfo').textContent=room.players.length+'/'+room.config.maxPlayers+' jogadores · '+MAPS[room.config.map].name+(complete?' · Sala pronta':' · aguardando');
   var start=$('roomStart');
-  start.style.display=isHost?'block':'none';
-  start.classList.toggle('disabled',!complete);
+  start.style.display='block';
+  start.classList.toggle('disabled',!isHost||!complete);
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
 function selectLobbyPiece(piece){
