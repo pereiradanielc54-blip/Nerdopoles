@@ -7,11 +7,49 @@ var FALLBACK=['🐱','🎩','🧰','⚔️','🛡️','🛸'];
 var COLORS=['#a94cff','#39b9ff','#ff5a62','#4edb83','#ffc93f','#ff62c7'];
 
 var S=[
-['Portal de Nerdora','start'],['Vila dos Novatos','prop',60,'brown',2],['Baú de Nerdora','chest'],['Beco dos Aventureiros','prop',60,'brown',4],['Tributo do Reino','tax',200],['Estação do Nyan','rail',200],['Distrito dos Aprendizes','prop',100,'lightblue',6],['Carta de Evento','event'],['Praça dos Otakus','prop',100,'lightblue',6],['Mercado dos Heróis','prop',120,'lightblue',8],['Calabouço Real','jail'],['Bosque Encantado','prop',140,'pink',10],['Fonte de Mana','util',150],['Vila dos Magos','prop',140,'pink',10],['Torre Arcana','prop',160,'pink',12],['Dirigível Real','rail',200],['Distrito dos Mercadores','prop',180,'orange',14],['Baú de Nerdora','chest'],['Arena dos Aventureiros','prop',180,'orange',14],['Grande Mercado de Nerdora','prop',200,'orange',16],['Descanso Livre','free'],['Distrito dos Guerreiros','prop',220,'red',18],['Carta de Evento','event'],['Fortaleza Rubra','prop',220,'red',18],['Arena Real','prop',240,'red',20],['Expresso de Nerdora','rail',200],['Jardins Dourados','prop',260,'yellow',22],['Templo do Sol','prop',260,'yellow',22],['Cristal de Energia','util',150],['Palácio Dourado','prop',280,'yellow',24],['Vá para o Calabouço','goto'],['Floresta dos Guardiões','prop',300,'green',26],['Cidade Élfica','prop',300,'green',26],['Baú de Nerdora','chest'],['Fortaleza dos Guardiões','prop',320,'green',28],['Portal Dimensional','rail',200],['Carta de Evento','event'],['Cidade Imperial de Nerdora','prop',350,'darkblue',35],['Taxa Imperial','tax',100],['Castelo de Nerdora','prop',400,'darkblue',50]
+['Portal de Nerdora','start'],
+['Vila dos Novatos','prop',60,'brown',2],
+['Baú de Nerdora','chest'],
+['Beco dos Aventureiros','prop',60,'brown',4],
+['Tributo do Reino','tax',200],
+['Estação do Nyan','rail',200],
+['Distrito dos Aprendizes','prop',100,'lightblue',6],
+['Carta de Evento','event'],
+['Praça dos Otakus','prop',100,'lightblue',6],
+['Mercado dos Heróis','prop',120,'lightblue',8],
+['Calabouço Real','jail'],
+['Bosque Encantado','prop',140,'pink',10],
+['Fonte de Mana','util',150],
+['Vila dos Magos','prop',140,'pink',10],
+['Torre Arcana','prop',160,'pink',12],
+['Dirigível Real','rail',200],
+['Distrito dos Mercadores','prop',180,'orange',14],
+['Baú de Nerdora','chest'],
+['Arena dos Aventureiros','prop',180,'orange',14],
+['Descanso Livre','free'],
+['Grande Mercado de Nerdora','prop',200,'orange',16],
+['Praça do Nyan','prop',220,'nyan',18],
+['Distrito dos Guerreiros','prop',220,'red',18],
+['Carta de Evento','event'],
+['Fortaleza Rubra','prop',220,'red',18],
+['Arena Real','prop',240,'red',20],
+['Expresso de Nerdora','rail',200],
+['Palácio Dourado','prop',280,'yellow',24],
+['Cristal de Energia','util',150],
+['Templo do Sol','prop',260,'yellow',22],
+['Jardins Dourados','prop',260,'yellow',22],
+['Vá para o Calabouço','goto'],
+['Floresta dos Guardiões','prop',300,'green',26],
+['Baú de Nerdora','chest'],
+['Fortaleza dos Guardiões','prop',320,'green',28],
+['Portal Dimensional','rail',200],
+['Carta de Evento','event'],
+['Cidade Imperial de Nerdora','prop',350,'darkblue',35],
+['Taxa Imperial','tax',100],
+['Castelo de Nerdora','prop',400,'darkblue',50]
 ];
-var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,19],red:[21,23,24],yellow:[26,27,29],green:[31,32,34],darkblue:[37,39]};
-var HOUSE_COST={brown:50,lightblue:50,pink:100,orange:100,red:150,yellow:150,green:200,darkblue:200};
-
+var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,20],nyan:[21],red:[22,24,25],yellow:[27,29,30],green:[32,34],darkblue:[37,39]};
+var HOUSE_COST={brown:50,lightblue:50,pink:100,orange:100,nyan:150,red:150,yellow:150,green:200,darkblue:200};
 var EVENT_CARDS=[
 ['Portal Dourado','Volte ao Portal de Nerdora e receba 200 N.','start'],
 ['Ordem da Guarda Real','Vá diretamente para o Calabouço Real.','jail'],
@@ -38,12 +76,14 @@ var CHEST_CARDS=[
 ];
 
 var positions=[
-[13.2,17.8],[21.4,18.4],[27.5,18.4],[33.9,18.4],[40.2,18.4],[46.6,18.4],[53.0,18.4],[59.2,18.4],[65.3,18.4],[71.8,18.4],[87.1,17.8],
+[13.2,17.8],
+[21.4,18.4],[27.5,18.4],[33.9,18.4],[40.2,18.4],[46.6,18.4],[53.0,18.4],[59.2,18.4],[65.3,18.4],[71.8,18.4],
+[87.1,17.8],
 [91.2,24.5],[91.6,30.8],[92.0,37.5],[92.2,44.3],[91.8,51.2],[92.0,58.4],[92.0,65.8],[91.8,71.9],
-[77.5,92.7],
 [94.2,91.2],
-[65.0,92.7],[59.2,92.7],[52.8,92.7],[46.8,92.7],[40.6,92.7],[16.4,92.7],[21.7,92.7],[27.8,92.7],[34.0,92.7],[6.0,91.0],
-[12.2,69.5],[12.2,74.5],[12.2,62.0],[12.4,54.6],[12.4,47.5],[12.4,40.0],[12.5,32.4],[12.5,25.3],[12.5,18.7]
+[77.5,92.7],[71.2,92.7],[65.0,92.7],[59.2,92.7],[52.8,92.7],[46.8,92.7],[40.6,92.7],[34.0,92.7],[27.8,92.7],[21.7,92.7],[16.4,92.7],
+[6.0,91.0],
+[12.2,74.5],[12.2,69.5],[12.2,62.0],[12.4,54.6],[12.4,47.5],[12.4,40.0],[12.5,32.4],[12.5,25.3]
 ],i;
 
 var PLAYER_SLOTS={
@@ -77,23 +117,14 @@ function mount(){
   d.innerHTML=
   '<div id="ngSlots"></div><div id="ngOwners"></div><div id="ngTokens"></div>'+
   '<button id="ngBack">← CONFIGURAÇÃO</button><div id="ngMap">Mapa 1 · Cidade de Nerdora</div>'+
-  '<section id="ngHud"><span class="ng-crystal left"></span><span class="ng-crystal right"></span>'+
-    '<div class="ng-hud-head">'+
-      '<div class="ng-panel ng-turn-box"><div id="ngTurn" class="ng-turn"></div><div id="ngRound" class="ng-sub"></div></div>'+
-      '<div class="ng-dice-altar"><div id="ngD1" class="ng-die">1</div><div id="ngD2" class="ng-die">1</div><button id="ngRoll" class="ng-roll">🎲 ROLAR DADOS</button></div>'+
-      '<div class="ng-panel ng-wallet"><div id="ngCash" class="ng-cash"></div><div id="ngPos" class="ng-sub"></div></div>'+
-    '</div>'+
-    '<div class="ng-hud-body">'+
-      '<div class="ng-panel ng-players"><div class="ng-title">AVENTUREIROS</div><div id="ngPlayers"></div></div>'+
-      '<div class="ng-center">'+
-        '<div class="ng-panel ng-location"><div id="ngSpace" class="ng-space"></div><div id="ngSpaceDesc" class="ng-space-desc"></div><div id="ngTip" class="ng-turn-tip"></div></div>'+
-        '<div class="ng-actions">'+
-          '<button id="ngBuy" class="ng-btn gold">COMPRAR</button><button id="ngAuction" class="ng-btn">LEILOAR</button><button id="ngBuild" class="ng-btn">CONSTRUIR</button>'+
-          '<button id="ngMortgage" class="ng-btn">HIPOTECAR</button><button id="ngTrade" class="ng-btn">NEGOCIAR</button><button id="ngEnd" class="ng-btn purple">ENCERRAR TURNO</button>'+
-        '</div>'+
-      '</div>'+
-      '<div class="ng-right"><div class="ng-decks"><button id="ngEvent" class="ng-deck">⭐<br>EVENTOS</button><button id="ngChest" class="ng-deck chest">🎁<br>BAÚS</button></div><div id="ngLog" class="ng-panel ng-log"></div></div>'+
-    '</div>'+
+  '<section id="ngHud">'+
+    '<div id="ngPlayerDock" class="ng-float"><div class="ng-title">AVENTUREIROS</div><div id="ngPlayers"></div></div>'+
+    '<div id="ngStatusDock" class="ng-float"><div id="ngTurn" class="ng-turn"></div><div id="ngRound" class="ng-sub"></div><div id="ngCash" class="ng-cash"></div><div id="ngPos" class="ng-sub"></div></div>'+
+    '<div id="ngSpaceDock" class="ng-float"><div id="ngSpace" class="ng-space"></div><div id="ngSpaceDesc" class="ng-space-desc"></div><div id="ngTip" class="ng-turn-tip"></div></div>'+
+    '<div id="ngDeckDock"><button id="ngEvent" class="ng-deck"><span>⭐</span><b>EVENTOS</b><small>Cartas de Nerdora</small></button><button id="ngChest" class="ng-deck chest"><span>🎁</span><b>BAÚS</b><small>Tesouros e surpresas</small></button></div>'+
+    '<div id="ngDiceDock" class="ng-float"><div class="ng-dice-line"><div id="ngD1" class="ng-die">1</div><div id="ngD2" class="ng-die">1</div></div><button id="ngRoll" class="ng-roll">🎲 ROLAR DADOS</button></div>'+
+    '<div id="ngActionBar"><button id="ngBuy" class="ng-btn gold">COMPRAR</button><button id="ngAuction" class="ng-btn">LEILOAR</button><button id="ngBuild" class="ng-btn">CONSTRUIR</button><button id="ngMortgage" class="ng-btn">HIPOTECAR</button><button id="ngTrade" class="ng-btn">NEGOCIAR</button><button id="ngEnd" class="ng-btn purple">ENCERRAR TURNO</button></div>'+
+    '<div id="ngLog" class="ng-float ng-log"></div>'+
   '</section>'+
   '<div id="ngModal"><div class="ng-modal-card"><div id="ngModalTitle" class="ng-modal-title"></div><div id="ngModalBody" class="ng-modal-body"></div><div id="ngModalActions" class="ng-modal-actions"></div></div></div>';
   frame.appendChild(d);root=d;
@@ -155,7 +186,7 @@ function hide(){if(root)root.classList.remove('on')}
 function save(){try{localStorage.setItem('nerdopoles-game',JSON.stringify(game))}catch(e){}}
 function log(s){
   logs.push(s);if(logs.length>40)logs.shift();
-  var e=document.getElementById('ngLog');if(e){e.innerHTML=logs.slice(-12).map(function(x){return '<div>'+x+'</div>'}).join('');e.scrollTop=e.scrollHeight}
+  var e=document.getElementById('ngLog');if(e){e.innerHTML=logs.slice(-5).map(function(x){return '<div>'+x+'</div>'}).join('');e.scrollTop=e.scrollHeight}
 }
 function render(){if(!game)return;renderTokens();renderOwners();renderPlayers();renderHud();save()}
 
@@ -216,21 +247,44 @@ function renderPlayers(){
   }).join('');
 }
 function renderHud(){
-  var p=game.p[game.t],s=S[p.pos],me=game.p[0],human=game.t===0&&!me.dead,pending=game.pending!=null;
-  document.getElementById('ngTurn').textContent=(human?'Sua vez':'Vez de '+p.n);
+  var p=game.p[game.t],sp=S[p.pos],me=game.p[0],human=game.t===0&&!me.dead,pending=game.pending!=null;
+  document.getElementById('ngTurn').textContent=human?'Sua vez':'Vez de '+p.n;
   document.getElementById('ngRound').textContent='Rodada '+game.r+(p.jail?' · no Calabouço':'');
-  document.getElementById('ngD1').textContent=game.d[0];document.getElementById('ngD2').textContent=game.d[1];
-  document.getElementById('ngCash').textContent=cash(me.m);document.getElementById('ngPos').textContent=S[me.pos][0];
-  document.getElementById('ngSpace').textContent=s[0];document.getElementById('ngSpaceDesc').innerHTML=desc(p.pos);
+  document.getElementById('ngD1').textContent=game.d[0];
+  document.getElementById('ngD2').textContent=game.d[1];
+  document.getElementById('ngCash').textContent=cash(me.m);
+  document.getElementById('ngPos').textContent=S[me.pos][0];
+  document.getElementById('ngSpace').textContent=sp[0];
+  document.getElementById('ngSpaceDesc').innerHTML=desc(p.pos);
   document.getElementById('ngTip').textContent=tip(human,pending);
-  document.getElementById('ngRoll').disabled=!(human&&game.phase==='roll'&&!moving);
-  document.getElementById('ngBuy').disabled=!(human&&game.phase==='decide'&&pending&&me.m>=S[game.pending][2]);
-  document.getElementById('ngAuction').disabled=!(human&&game.phase==='decide'&&pending&&game.c.auctions!==false);
-  document.getElementById('ngBuild').disabled=!(human&&buildable(0).length);
-  document.getElementById('ngMortgage').disabled=!(human&&me.props.length);
-  document.getElementById('ngTrade').disabled=!(human&&game.c.trades!==false&&me.props.length);
-  var end=document.getElementById('ngEnd');end.disabled=!(human&&(game.phase==='end'||game.phase==='decide'));end.textContent=game.phase==='decide'?'RECUSAR':'ENCERRAR TURNO';
+
+  var canRoll=human&&game.phase==='roll'&&!moving;
+  var canBuy=human&&game.phase==='decide'&&pending&&me.m>=S[game.pending][2];
+  var canAuction=human&&game.phase==='decide'&&pending&&game.c.auctions!==false;
+  var canBuildNow=human&&buildable(0).length>0;
+  var canMortgage=human&&me.props.length>0;
+  var canTrade=human&&game.c.trades!==false&&me.props.length>0;
+  var canEnd=human&&(game.phase==='end'||game.phase==='decide');
+
+  var roll=document.getElementById('ngRoll');
+  roll.disabled=!canRoll;
+  document.getElementById('ngDiceDock').classList.toggle('inactive',!human);
+
+  var actionBar=document.getElementById('ngActionBar');
+  var actions=[
+    ['ngBuy',canBuy],['ngAuction',canAuction],['ngBuild',canBuildNow],
+    ['ngMortgage',canMortgage],['ngTrade',canTrade],['ngEnd',canEnd]
+  ];
+  var visibleCount=0;
+  actions.forEach(function(pair){
+    var el=document.getElementById(pair[0]),show=!!pair[1];
+    el.hidden=!show;el.disabled=!show;if(show)visibleCount++;
+  });
+  var end=document.getElementById('ngEnd');
+  end.textContent=game.phase==='decide'?'RECUSAR':'ENCERRAR TURNO';
+  actionBar.hidden=!human||visibleCount===0;
 }
+
 function tip(human,pending){
   if(!human)return 'Os bots estão decidindo. Observe as compras, aluguéis e construções.';
   if(game.phase==='roll')return game.p[game.t].dbl>0?'Dupla! As ações da casa foram resolvidas. Agora role os dados novamente.':'Role os dados. Duplas dão outra jogada; três duplas seguidas levam ao Calabouço.';
