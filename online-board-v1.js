@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 
-var PIECES=[0,1,2,3,4,5].map(function(i){return '/assets/tokens/token-'+i+'.png'});
+var PIECES=[0,1,2,3,4,5].map(function(i){return './assets/tokens/token-'+i+'.png'});
 var SPACE_COLORS={brown:'#9b5b3c',lightblue:'#57c9ff',pink:'#ff6fcb',orange:'#ff9b3c',nyan:'#9f7cff',red:'#ff525f',yellow:'#ffd557',green:'#4fd985',darkblue:'#5975ff',rail:'#b89cff',util:'#55e7ff',event:'#b95cff',chest:'#43d89d',tax:'#ffbf5a',jail:'#ff6a6a',goto:'#ff4b5b',free:'#63d8ff',start:'#9d6cff'};
 var S=[
 ['Portal de Nerdora','start'],
