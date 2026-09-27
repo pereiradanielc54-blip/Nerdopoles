@@ -298,7 +298,9 @@ async function hostLand(dice,dbl){
   }
   if(s[1]==='tax'){hostPay(pi,s[2],null)}
   else if(s[1]==='goto'){hostJail(pi)}
-  else if((s[1]==='event'||s[1]==='chest')&&state.config.events){await hostCard(s[1],pi)}
+  else if(s[1]==='chest'){await hostCard('chest',pi)}
+  else if(s[1]==='event'&&state.config.events){await hostCard('event',pi)}
+  else if(s[1]==='event'&&!state.config.events){notice('Cartas de Evento estão desativadas nesta sala.')}
   state.phase=dbl&&!p.jail?'roll':'end';broadcast();
 }
 function hostBuy(){
