@@ -17,7 +17,7 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#050008}
 body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:manipulation;user-select:none}
 #app{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;display:grid;place-items:center;background:radial-gradient(ellipse at 0% 50%,rgba(147,35,255,.62),rgba(99,16,185,.28) 24%,transparent 65%),radial-gradient(ellipse at 100% 50%,rgba(147,35,255,.62),rgba(99,16,185,.28) 24%,transparent 65%),#050008}
 .stage{position:absolute;top:env(safe-area-inset-top,0);right:env(safe-area-inset-right,0);bottom:env(safe-area-inset-bottom,0);left:env(safe-area-inset-left,0);display:grid;place-items:center;overflow:hidden}
-.frame{position:relative;width:100%;height:100%;overflow:hidden}
+.frame{position:relative;width:100%;height:100%;overflow:hidden;container-type:size;container-name:gameframe}
 .art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;-webkit-user-drag:none;pointer-events:none}
 .hot,.choice,.arrow,.toggle{position:absolute;z-index:20;border:0;padding:0;margin:0;background:transparent;cursor:pointer;touch-action:manipulation}
 button:focus-visible{outline:3px solid #fff;outline-offset:2px}
@@ -182,7 +182,27 @@ try{Object.assign(s,JSON.parse(localStorage.getItem('nerdopoles-config')||'{}'))
 const $=id=>document.getElementById(id),stage=$('stage'),frame=$('frame'),art=$('art'),play=$('play'),cfg=$('config'),toast=$('toast');
 let timer;
 let currentRatio=16/9;
-function fit(){const w=stage.clientWidth,h=stage.clientHeight,r=currentRatio||16/9;if(!w||!h)return;let fw=w,fh=fw/r;if(fh>h){fh=h;fw=fh*r}frame.style.width=fw+'px';frame.style.height=fh+'px'}
+let fitRaf=0;
+function fit(){
+  cancelAnimationFrame(fitRaf);
+  fitRaf=requestAnimationFrame(()=>{
+    const r=currentRatio||16/9;
+    let w=stage.clientWidth,h=stage.clientHeight;
+    const vv=window.visualViewport;
+    if(vv&&vv.width&&vv.height){
+      w=Math.min(w,vv.width);
+      h=Math.min(h,vv.height);
+    }
+    if(!w||!h)return;
+    let fw=w,fh=fw/r;
+    if(fh>h){fh=h;fw=fh*r}
+    frame.style.width=Math.max(1,Math.round(fw))+'px';
+    frame.style.height=Math.max(1,Math.round(fh))+'px';
+    frame.style.setProperty('--frame-width',fw+'px');
+    frame.style.setProperty('--frame-height',fh+'px');
+  });
+}
+window.NerdFit=fit;
 function setArtwork(src,ratio){currentRatio=ratio;art.src=src;fit()}
 function save(){try{localStorage.setItem('nerdopoles-config',JSON.stringify(s))}catch(_){}}
 function note(t){toast.textContent=t;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),900)}
@@ -220,7 +240,15 @@ function tog(k,label){s[k]=!s[k];save();render();note(label+': '+(s[k]?'ativado'
 $('trade').onclick=()=>tog('trades','Trocas');$('auction').onclick=()=>tog('auctions','Leilões');$('event').onclick=()=>tog('events','Cartas de evento');
 $('start').onclick=()=>showBoard(true);
 window.addEventListener('popstate',()=>{if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false)});
-window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);fit();if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false);
+window.addEventListener('resize',fit);
+window.addEventListener('orientationchange',()=>{fit();setTimeout(fit,120);setTimeout(fit,320)});
+document.addEventListener('fullscreenchange',()=>{fit();setTimeout(fit,120)});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',fit);
+  window.visualViewport.addEventListener('scroll',fit);
+}
+if('ResizeObserver'in window)new ResizeObserver(fit).observe(stage);
+fit();if(location.hash==='#tabuleiro')showBoard(false);else if(location.hash==='#configuracao')showConfig(false);else showMenu(false);
 async function immersive(){try{if(screen.orientation?.lock)await screen.orientation.lock('landscape')}catch(_){}try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(_){}}
 document.addEventListener('pointerdown',immersive,{once:true,passive:true});
 if('serviceWorker'in navigator){
