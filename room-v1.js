@@ -2,12 +2,12 @@
 (function(){
 'use strict';
 
-var MENU='/assets/nerdopoles-menu.jpg';
-var CREATE_ROOM='/assets/nerdopoles-create-room.png';
-var LOBBY='/assets/nerdopoles-lobby.png';
-var BOARD='/assets/nerdopoles-board-01.png';
+var MENU='./assets/nerdopoles-menu.jpg';
+var CREATE_ROOM='./assets/nerdopoles-create-room.png';
+var LOBBY='./assets/nerdopoles-lobby.png';
+var BOARD='./assets/nerdopoles-board-01.png';
 var PIECES=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
-var PIECE_SRC=[0,1,2,3,4,5].map(function(i){return '/assets/tokens/token-'+i+'.png'});
+var PIECE_SRC=[0,1,2,3,4,5].map(function(i){return './assets/tokens/token-'+i+'.png'});
 var SLOT_COLORS=['#ff3f5d','#3f8cff','#5adb67','#e8a93f','#b64cff','#ff8d3f'];
 var MAPS=[
   {name:'Cidade de Nerdora',status:'disponível'},
@@ -400,7 +400,7 @@ function renderLobby(){
 
   $('roomCode').textContent=room.code;
   var complete=room.players.length===room.config.maxPlayers&&room.players.every(function(p){return p.piece!=null});
-  $('roomLobbyInfo').textContent=room.players.length+'/'+room.config.maxPlayers+' jogadores · '+MAPS[room.config.map].name+(complete?' · Sala pronta':' · aguardando');
+  $('roomLobbyInfo').textContent=room.players.length+'./'+room.config.maxPlayers+' jogadores · '+MAPS[room.config.map].name+(complete?' · Sala pronta':' · aguardando');
   var start=$('roomStart');
   start.style.display='block';
   start.classList.toggle('disabled',!isHost||!complete);
