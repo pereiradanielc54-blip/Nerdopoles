@@ -6,90 +6,90 @@
 .ng-slot{position:absolute;width:1px;height:1px}
 
 /* Peças: o ponto top/left representa a base da miniatura dentro da casa. */
-.ng-token{position:absolute;transform:translate(-50%,-100%);transform-origin:50% 100%;width:clamp(34px,4vw,62px);height:clamp(36px,4.2vw,66px);display:grid;place-items:end center;transition:left .32s cubic-bezier(.2,.75,.2,1),top .32s cubic-bezier(.2,.75,.2,1),transform .16s ease;z-index:60;filter:drop-shadow(0 6px 6px #000d);isolation:isolate}
+.ng-token{position:absolute;transform:translate(-50%,-100%);transform-origin:50% 100%;width:clamp(34px,4cqw,62px);height:clamp(36px,4.2cqw,66px);display:grid;place-items:end center;transition:left .32s cubic-bezier(.2,.75,.2,1),top .32s cubic-bezier(.2,.75,.2,1),transform .16s ease;z-index:60;filter:drop-shadow(0 6px 6px #000d);isolation:isolate}
 .ng-token.me{z-index:66;transform:translate(-50%,-100%) scale(1.16)}
 .ng-token img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;z-index:3;pointer-events:none}
-.ng-token .fallback{position:absolute;left:9%;right:9%;bottom:2%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#fff 0 10%,var(--c) 18% 64%,#150927 100%);border:2px solid #fff;font-size:clamp(14px,1.7vw,25px);z-index:1;box-shadow:0 0 12px var(--c)}
+.ng-token .fallback{position:absolute;left:9%;right:9%;bottom:2%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#fff 0 10%,var(--c) 18% 64%,#150927 100%);border:2px solid #fff;font-size:clamp(14px,1.7cqw,25px);z-index:1;box-shadow:0 0 12px var(--c)}
 .ng-token .token-badge{position:absolute;right:-2px;bottom:-2px;width:28%;aspect-ratio:1;border-radius:50%;background:var(--c);border:1px solid #fff;z-index:4;box-shadow:0 2px 5px #000b}
 
 /* Propriedade, casas e hotéis */
-.ng-owner-flag{position:absolute;transform:translate(-50%,-50%);width:clamp(8px,.8vw,12px);height:clamp(11px,1.05vw,16px);background:var(--c);clip-path:polygon(0 0,100% 16%,70% 48%,100% 80%,0 100%);border-radius:2px;filter:drop-shadow(0 2px 2px #000a);z-index:2}
+.ng-owner-flag{position:absolute;transform:translate(-50%,-50%);width:clamp(8px,.8cqw,12px);height:clamp(11px,1.05cqw,16px);background:var(--c);clip-path:polygon(0 0,100% 16%,70% 48%,100% 80%,0 100%);border-radius:2px;filter:drop-shadow(0 2px 2px #000a);z-index:2}
 .ng-buildings{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:flex-end;gap:1px;z-index:4;filter:drop-shadow(0 2px 2px #000a)}
-.ng-house-mini{position:relative;width:clamp(8px,.72vw,12px);height:clamp(7px,.64vw,10px);background:var(--owner);border:1px solid rgba(255,255,255,.8);border-radius:1px}
+.ng-house-mini{position:relative;width:clamp(8px,.72cqw,12px);height:clamp(7px,.64cqw,10px);background:var(--owner);border:1px solid rgba(255,255,255,.8);border-radius:1px}
 .ng-house-mini:before{content:"";position:absolute;left:-18%;top:-55%;width:136%;height:68%;background:var(--owner);clip-path:polygon(50% 0,100% 100%,0 100%);filter:brightness(1.18)}
-.ng-hotel-mini{position:relative;width:clamp(16px,1.3vw,21px);height:clamp(9px,.78vw,13px);background:var(--owner);border:1px solid #fff;border-radius:2px}
+.ng-hotel-mini{position:relative;width:clamp(16px,1.3cqw,21px);height:clamp(9px,.78cqw,13px);background:var(--owner);border:1px solid #fff;border-radius:2px}
 .ng-hotel-mini:before{content:"";position:absolute;left:-8%;top:-48%;width:116%;height:58%;background:var(--owner);clip-path:polygon(14% 100%,14% 40%,38% 40%,38% 0,63% 0,63% 40%,86% 40%,86% 100%);filter:brightness(1.2)}
 
 /* HUD flutuante: não existe mais uma tela escura cobrindo o centro. */
 #ngHud{position:absolute;inset:0;z-index:32;pointer-events:none;overflow:visible}
 .ng-float{pointer-events:auto;background:linear-gradient(180deg,rgba(20,17,57,.86),rgba(8,12,34,.82));border:1px solid rgba(170,132,235,.55);box-shadow:0 8px 22px #0008,inset 0 0 16px rgba(122,61,207,.08);backdrop-filter:blur(4px);border-radius:13px}
-.ng-title{font-size:clamp(6.5px,.7vw,10.5px);font-weight:950;color:#dbcaff;margin-bottom:5%;letter-spacing:.04em}
+.ng-title{font-size:clamp(6.5px,.7cqw,10.5px);font-weight:950;color:#dbcaff;margin-bottom:5%;letter-spacing:.04em}
 
 /* Jogadores ficam fixos à esquerda do centro, sem cobrir casas. */
 #ngPlayerDock{position:absolute;left:22.6%;top:27.4%;width:16.5%;max-height:36%;padding:1.15%;overflow:auto}
 #ngPlayers{display:block;width:100%;color:#fff}
-.ng-player{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4%;padding:3%;min-height:20px;border-radius:8px;background:rgba(24,28,69,.9);margin-bottom:3%;font-size:clamp(5.3px,.58vw,8.8px);align-items:center;border:1px solid transparent;color:#fff}
+.ng-player{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4%;padding:3%;min-height:20px;border-radius:8px;background:rgba(24,28,69,.9);margin-bottom:3%;font-size:clamp(5.3px,.58cqw,8.8px);align-items:center;border:1px solid transparent;color:#fff}
 .ng-player.active{border-color:#ffd45e;box-shadow:0 0 10px rgba(255,205,79,.17)}
 .ng-player.dead{opacity:.38;text-decoration:line-through}
-.ng-player-color{width:clamp(7px,.68vw,10px);aspect-ratio:1;border-radius:50%;background:var(--pc);box-shadow:0 0 6px var(--pc)}
+.ng-player-color{width:clamp(7px,.68cqw,10px);aspect-ratio:1;border-radius:50%;background:var(--pc);box-shadow:0 0 6px var(--pc)}
 .ng-pmoney{color:#80ffc0;font-weight:850}
 
 /* Status atual */
 #ngStatusDock{position:absolute;left:40.2%;top:25.6%;width:19.6%;min-height:9%;padding:.9% 1.1%;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center}
-.ng-turn{font-size:clamp(8px,.9vw,14px);font-weight:950;color:#ffe46e;text-shadow:0 0 8px rgba(255,222,86,.35)}
-.ng-sub{font-size:clamp(5.4px,.6vw,9px);color:#c9d1ff;margin-top:2px}
-.ng-cash{grid-column:2;grid-row:1;font-size:clamp(9px,1vw,15px);font-weight:950;color:#79ffc1;text-align:right}
+.ng-turn{font-size:clamp(8px,.9cqw,14px);font-weight:950;color:#ffe46e;text-shadow:0 0 8px rgba(255,222,86,.35)}
+.ng-sub{font-size:clamp(5.4px,.6cqw,9px);color:#c9d1ff;margin-top:2px}
+.ng-cash{grid-column:2;grid-row:1;font-size:clamp(9px,1cqw,15px);font-weight:950;color:#79ffc1;text-align:right}
 #ngPos{grid-column:2;grid-row:2;text-align:right;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Informações da casa atual */
 #ngSpaceDock{position:absolute;left:40.2%;top:36.0%;width:22.8%;min-height:12%;max-height:19%;padding:1.1%;overflow:auto}
-.ng-space{font-size:clamp(8px,.9vw,14px);font-weight:950;color:#fff}
-.ng-space-desc{font-size:clamp(5.8px,.63vw,9.4px);color:#cbd3ff;line-height:1.22;margin-top:2%}
-.ng-turn-tip{margin-top:2.8%;padding:2% 2.6%;border-radius:8px;background:rgba(85,40,140,.32);border-left:3px solid #b76cff;color:#ebdcff;font-size:clamp(5.2px,.58vw,8.7px);line-height:1.17}
+.ng-space{font-size:clamp(8px,.9cqw,14px);font-weight:950;color:#fff}
+.ng-space-desc{font-size:clamp(5.8px,.63cqw,9.4px);color:#cbd3ff;line-height:1.22;margin-top:2%}
+.ng-turn-tip{margin-top:2.8%;padding:2% 2.6%;border-radius:8px;background:rgba(85,40,140,.32);border-left:3px solid #b76cff;color:#ebdcff;font-size:clamp(5.2px,.58cqw,8.7px);line-height:1.17}
 
 /* Dois baralhos fixos no meio do mapa */
 #ngDeckDock{position:absolute;left:47.2%;top:51.0%;width:18.5%;height:14.8%;display:grid;grid-template-columns:1fr 1fr;gap:8%;pointer-events:auto}
 .ng-deck{border-radius:14px;border:1px solid #a071ea;background:linear-gradient(145deg,rgba(92,35,142,.94),rgba(23,18,61,.96));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:950;cursor:pointer;box-shadow:0 8px 16px #0008,inset 0 0 20px rgba(255,255,255,.04);transform:rotate(-2deg)}
 .ng-deck:nth-child(2){transform:rotate(2deg)}
 .ng-deck.chest{background:linear-gradient(145deg,rgba(14,118,80,.95),rgba(17,55,31,.97));border-color:#61dfad}
-.ng-deck span{font-size:clamp(16px,2vw,30px);line-height:1}
-.ng-deck b{font-size:clamp(6px,.68vw,10px);margin-top:4px}
-.ng-deck small{font-size:clamp(4.8px,.52vw,7.8px);opacity:.75;margin-top:2px}
+.ng-deck span{font-size:clamp(16px,2cqw,30px);line-height:1}
+.ng-deck b{font-size:clamp(6px,.68cqw,10px);margin-top:4px}
+.ng-deck small{font-size:clamp(4.8px,.52cqw,7.8px);opacity:.75;margin-top:2px}
 
 /* Campo dos dados fixo */
 #ngDiceDock{position:absolute;left:64.6%;top:27.2%;width:12.8%;min-height:22%;padding:1%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8%}
 .ng-dice-line{display:flex;align-items:center;justify-content:center;gap:8%}
-.ng-die{width:clamp(31px,3.35vw,52px);aspect-ratio:1;border-radius:12px;background:linear-gradient(145deg,#fff,#dcdceb);color:#2b0b48;display:grid;place-items:center;font-size:clamp(19px,2.15vw,33px);font-weight:1000;box-shadow:0 6px 12px #0009,inset 0 0 0 2px #fff;transform-style:preserve-3d}
+.ng-die{width:clamp(31px,3.35cqw,52px);aspect-ratio:1;border-radius:12px;background:linear-gradient(145deg,#fff,#dcdceb);color:#2b0b48;display:grid;place-items:center;font-size:clamp(19px,2.15cqw,33px);font-weight:1000;box-shadow:0 6px 12px #0009,inset 0 0 0 2px #fff;transform-style:preserve-3d}
 .ng-die.rolling{animation:ngDiceShake .42s linear infinite}
 @keyframes ngDiceShake{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-7px) rotate(18deg)}50%{transform:translateY(2px) rotate(-14deg)}75%{transform:translateY(-4px) rotate(10deg)}100%{transform:translateY(0) rotate(0)}}
-.ng-roll{min-height:30px;width:92%;border-radius:10px;border:1px solid #ffd66b;background:linear-gradient(180deg,#c03cff,#6610b7);color:#fff;font-weight:950;font-size:clamp(6.5px,.72vw,11px);cursor:pointer;box-shadow:0 0 15px rgba(188,64,255,.42),inset 0 0 0 1px rgba(255,255,255,.14)}
+.ng-roll{min-height:30px;width:92%;border-radius:10px;border:1px solid #ffd66b;background:linear-gradient(180deg,#c03cff,#6610b7);color:#fff;font-weight:950;font-size:clamp(6.5px,.72cqw,11px);cursor:pointer;box-shadow:0 0 15px rgba(188,64,255,.42),inset 0 0 0 1px rgba(255,255,255,.14)}
 .ng-roll:disabled{opacity:.32;cursor:default}
 #ngDiceDock.inactive .ng-roll{visibility:hidden}
 
 /* Somente ações válidas aparecem; a barra desaparece nos turnos dos bots. */
 #ngActionBar{position:absolute;left:38.8%;top:68.3%;width:38.8%;min-height:7.2%;display:flex;align-items:stretch;justify-content:center;gap:1.3%;pointer-events:auto}
 #ngActionBar[hidden]{display:none!important}
-.ng-btn{flex:1;min-width:0;border-radius:10px;border:1px solid #6d64a5;background:linear-gradient(180deg,rgba(39,33,95,.96),rgba(17,20,58,.97));color:#fff;font-size:clamp(5.2px,.58vw,8.8px);font-weight:900;cursor:pointer;box-shadow:0 6px 14px #0007}
+.ng-btn{flex:1;min-width:0;border-radius:10px;border:1px solid #6d64a5;background:linear-gradient(180deg,rgba(39,33,95,.96),rgba(17,20,58,.97));color:#fff;font-size:clamp(5.2px,.58cqw,8.8px);font-weight:900;cursor:pointer;box-shadow:0 6px 14px #0007}
 .ng-btn[hidden]{display:none!important}
 .ng-btn.gold{background:linear-gradient(180deg,#bd7a18,#653506);border-color:#ffd164}
 .ng-btn.purple{background:linear-gradient(180deg,#8d2ce8,#4e0a98);border-color:#ce7dff}
 
 /* Histórico pequeno e fixo à direita */
-.ng-log{position:absolute;left:64.6%;top:51.0%;width:12.8%;max-height:15.3%;padding:.8%;overflow:auto;font-size:clamp(4.8px,.52vw,8px);line-height:1.2}
+.ng-log{position:absolute;left:64.6%;top:51.0%;width:12.8%;max-height:15.3%;padding:.8%;overflow:auto;font-size:clamp(4.8px,.52cqw,8px);line-height:1.2}
 .ng-log div{padding:2px 0;border-bottom:1px solid #ffffff10}
 .ng-log b{color:#ffe471}
 
 /* Botões gerais */
-#ngBack{position:absolute;left:19%;top:18%;pointer-events:auto;z-index:70;border-radius:9px;border:1px solid #7b70b0;background:rgba(14,17,49,.93);color:#fff;padding:.45em .8em;font-weight:900;font-size:clamp(6px,.65vw,10px);cursor:pointer}
-#ngMap{position:absolute;right:19%;top:18%;z-index:70;border-radius:9px;border:1px solid #4d4774;background:rgba(14,17,49,.93);color:#dfe4ff;padding:.45em .8em;font-weight:800;font-size:clamp(6px,.65vw,10px)}
+#ngBack{position:absolute;left:19%;top:18%;pointer-events:auto;z-index:70;border-radius:9px;border:1px solid #7b70b0;background:rgba(14,17,49,.93);color:#fff;padding:.45em .8em;font-weight:900;font-size:clamp(6px,.65cqw,10px);cursor:pointer}
+#ngMap{position:absolute;right:19%;top:18%;z-index:70;border-radius:9px;border:1px solid #4d4774;background:rgba(14,17,49,.93);color:#dfe4ff;padding:.45em .8em;font-weight:800;font-size:clamp(6px,.65cqw,10px)}
 
 /* Cartas/modal */
 #ngModal{position:absolute;inset:0;z-index:90;display:none;place-items:center;background:rgba(5,7,20,.66);backdrop-filter:blur(3px);pointer-events:auto;padding:5%}
 #ngModal.on{display:grid}
 .ng-modal-card{width:min(72%,620px);max-height:78%;overflow:auto;border-radius:20px;background:linear-gradient(180deg,#1c1547,#090d29);border:1px solid #a475ff;box-shadow:0 20px 50px #000c,0 0 32px rgba(142,64,255,.22);padding:4%;position:relative}
 .ng-modal-card:before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,210,103,.13);border-radius:15px;pointer-events:none}
-.ng-modal-title{font-size:clamp(13px,1.4vw,21px);font-weight:950;color:#ffe477}
-.ng-modal-body{font-size:clamp(8px,.82vw,12px);line-height:1.4;color:#eff1ff;margin-top:2%}
+.ng-modal-title{font-size:clamp(13px,1.4cqw,21px);font-weight:950;color:#ffe477}
+.ng-modal-body{font-size:clamp(8px,.82cqw,12px);line-height:1.4;color:#eff1ff;margin-top:2%}
 .ng-modal-actions{display:flex;gap:3%;flex-wrap:wrap;margin-top:4%}
 .ng-modal-btn{flex:1;min-height:34px;border-radius:10px;border:1px solid #7468b6;background:#211b57;color:#fff;font-weight:900;cursor:pointer}
 .ng-modal-btn.gold{background:linear-gradient(#bd7918,#653502);border-color:#ffd06b}
@@ -152,13 +152,13 @@
   box-shadow:0 0 12px color-mix(in srgb,var(--pc) 35%,transparent),inset 0 0 14px rgba(255,255,255,.025);
 }
 .ng-player-piece{
-  width:clamp(25px,2.1vw,34px);height:clamp(25px,2.1vw,34px);
+  width:clamp(25px,2.1cqw,34px);height:clamp(25px,2.1cqw,34px);
   border-radius:50%;display:grid;place-items:center;overflow:hidden;
   background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.15),rgba(5,7,24,.64));
   border:1px solid var(--pc);box-shadow:0 0 7px color-mix(in srgb,var(--pc) 55%,transparent);
 }
 .ng-player-piece img{width:122%;height:122%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 2px 2px #000b)}
-.ng-player-piece span{font-size:clamp(11px,1.15vw,17px)}
+.ng-player-piece span{font-size:clamp(11px,1.15cqw,17px)}
 .ng-player-main{min-width:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .ng-player-main b{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ng-state{font-style:normal;font-size:.72em;padding:2px 4px;border-radius:999px;font-weight:900;letter-spacing:.02em}
