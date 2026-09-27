@@ -160,7 +160,7 @@ async function normalizeGameState(g){
     if(!p.c)p.c=COLORS[idx%COLORS.length];
   });
   if(typeof g.bonusRoll!=='boolean')g.bonusRoll=false;
-  g.version=3;
+  g.version=4;
   return g;
 }
 
@@ -169,7 +169,7 @@ function newGame(){
   var colors=shuffle(COLORS.slice()),avail=[0,1,2,3,4,5].filter(function(n){return n!==chosen});shuffle(avail);
   var ps=[player(0,'Você',chosen,colors[0],money)];
   for(var n=1;n<=b;n++)ps.push(player(n,'BOT '+n,avail[(n-1)%avail.length],colors[n%colors.length],money));
-  return {version:3,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,bonusRoll:false,a:{},created:Date.now()};
+  return {version:4,c:c,p:ps,t:0,r:1,d:[1,1],phase:'roll',pending:null,bonusRoll:false,a:{},created:Date.now()};
 }
 function player(id,name,piece,color,money){return{id:id,n:name,piece:piece,c:color,m:money,pos:0,props:[],jail:false,jt:0,key:0,dead:false,dbl:0}}
 
@@ -179,7 +179,7 @@ async function start(){
 }
 function resume(){
   mount();try{game=JSON.parse(localStorage.getItem('nerdopoles-game')||'null')}catch(e){game=null}
-  if(!game)game=newGame();game=normalizeGameState(game);root.classList.add('on');render();
+  if(!game||Number(game.version||0)<4)game=newGame();game=normalizeGameState(game);root.classList.add('on');render();
   if(game.t!==0&&game.phase==='roll')setTimeout(botTurn,900);
 }
 function hide(){if(root)root.classList.remove('on')}
