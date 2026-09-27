@@ -1,7 +1,7 @@
 
 (function(){
 'use strict';
-var BOARD='/assets/nerdopoles-board-01.png';
+var BOARD='./assets/nerdopoles-board-01.png';
 var PIECE_NAMES=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
 var FALLBACK=['🐱','🎩','🧰','⚔️','🛡️','🛸'];
 var COLORS=['#a94cff','#39b9ff','#ff5a62','#4edb83','#ffc93f','#ff62c7'];
@@ -99,7 +99,7 @@ function playerBase(idx,playerId){
   return [base[0]+o[0],base[1]+o[1]];
 }
 
-var game=null,root=null,logs=[],moving=false,pieceSprites=['/assets/tokens/token-0.png','/assets/tokens/token-1.png','/assets/tokens/token-2.png','/assets/tokens/token-3.png','/assets/tokens/token-4.png','/assets/tokens/token-5.png'];
+var game=null,root=null,logs=[],moving=false,pieceSprites=['./assets/tokens/token-0.png','./assets/tokens/token-1.png','./assets/tokens/token-2.png','./assets/tokens/token-3.png','./assets/tokens/token-4.png','./assets/tokens/token-5.png'];
 
 function cfg(){
   try{return JSON.parse(localStorage.getItem('nerdopoles-config')||'{}')}catch(e){return {}}
