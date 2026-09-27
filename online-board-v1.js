@@ -189,9 +189,9 @@ function renderOwners(){
   Object.keys(state.assets).forEach(function(k){
     var a=state.assets[k];if(a.owner==null)return;
     var idx=Number(k),p=state.players[a.owner],xy=POS[idx],flag=document.createElement('div');
-    flag.className='ngo-owner';flag.style.left='calc('+xy[0]+'% - 13px)';flag.style.top='calc('+xy[1]+'% + 12px)';flag.style.setProperty('--pc',p.color);e.appendChild(flag);
+    flag.className='ngo-owner';flag.style.left='calc('+xy[0]+'% - .85cqw)';flag.style.top='calc('+xy[1]+'% + .78cqw)';flag.style.setProperty('--pc',p.color);e.appendChild(flag);
     if(a.h){
-      var b=document.createElement('div');b.className='ngo-buildings';b.style.left='calc('+xy[0]+'% + 12px)';b.style.top='calc('+xy[1]+'% + 12px)';b.style.setProperty('--pc',p.color);
+      var b=document.createElement('div');b.className='ngo-buildings';b.style.left='calc('+xy[0]+'% + .78cqw)';b.style.top='calc('+xy[1]+'% + .78cqw)';b.style.setProperty('--pc',p.color);
       if(a.h>=5){var hotel=document.createElement('i');hotel.className='ngo-hotel';b.appendChild(hotel)}
       else for(var h=0;h<a.h;h++){var q=document.createElement('i');q.className='ngo-house';b.appendChild(q)}
       e.appendChild(b);
