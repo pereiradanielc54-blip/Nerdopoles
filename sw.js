@@ -1,4 +1,4 @@
-const CACHE='nerdopoles-v1.0.5-exact-route-floating-ui';
+const CACHE='nerdopoles-v1.0.6-visual-polish';
 const APP_SHELL=['/version.json','/assets/tokens/token-0.png','/assets/tokens/token-1.png','/assets/tokens/token-2.png','/assets/tokens/token-3.png','/assets/tokens/token-4.png','/assets/tokens/token-5.png','/board-v2.css','/board-v2.js','/assets/nerdopoles-pieces.png','/','/index.html','/manifest.webmanifest','/icons/icon.svg','/assets/nerdopoles-menu.jpg','/assets/nerdopoles-config.jpg','/assets/nerdopoles-board-01.png'];
 
 self.addEventListener('install',event=>{
