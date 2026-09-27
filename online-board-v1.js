@@ -25,6 +25,7 @@ var S=[
 ['Baú de Nerdora','chest'],
 ['Arena dos Aventureiros','prop',180,'orange',14],
 ['Descanso Livre','free'],
+['Arena dos Aventureiros','prop',200,'orange',16],
 ['Grande Mercado de Nerdora','prop',200,'orange',16],
 ['Praça do Nyan','prop',220,'nyan',18],
 ['Distrito dos Guerreiros','prop',220,'red',18],
@@ -46,20 +47,31 @@ var S=[
 ['Taxa Imperial','tax',100],
 ['Castelo de Nerdora','prop',400,'darkblue',50]
 ];
-var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,20],nyan:[21],red:[22,24,25],yellow:[27,29,30],green:[32,34],darkblue:[37,39]};
+var GROUPS={brown:[1,3],lightblue:[6,8,9],pink:[11,13,14],orange:[16,18,20,21],nyan:[22],red:[23,25,26],yellow:[28,30,31],green:[33,35],darkblue:[38,40]};
 var HOUSE_COST={brown:50,lightblue:50,pink:100,orange:100,nyan:150,red:150,yellow:150,green:200,darkblue:200};
-var POS=[
-[13.2,17.8],[21.4,18.4],[27.5,18.4],[33.9,18.4],[40.2,18.4],[46.6,18.4],[53.0,18.4],[59.2,18.4],[65.3,18.4],[71.8,18.4],[87.1,17.8],
-[91.2,24.5],[91.6,30.8],[92.0,37.5],[92.2,44.3],[91.8,51.2],[92.0,58.4],[92.0,65.8],[91.8,71.9],[94.2,91.2],
-[77.5,92.7],[71.2,92.7],[65.0,92.7],[59.2,92.7],[52.8,92.7],[46.8,92.7],[40.6,92.7],[34.0,92.7],[27.8,92.7],[21.7,92.7],[16.4,92.7],
-[6.0,91.0],[12.2,74.5],[12.2,69.5],[12.2,62.0],[12.4,54.6],[12.4,47.5],[12.4,40.0],[12.5,32.4],[12.5,25.3]
+var CELL_RECTS=[
+[8.556,8.323,17.380,18.430],
+[18.984,8.323,24.332,18.430],[25.455,8.323,30.749,18.430],[31.925,8.323,37.861,18.430],[39.091,8.323,44.385,18.430],[45.668,8.323,51.390,18.430],[52.620,8.323,58.289,18.430],[59.519,8.323,64.706,18.430],[65.882,8.323,71.230,18.430],[72.406,8.323,79.572,18.430],
+[82.086,8.323,92.781,18.430],
+[83.690,19.382,94.545,24.970],[83.850,26.635,94.652,31.986],[84.064,33.888,94.759,39.120],[84.225,41.141,94.866,46.373],[84.225,48.395,94.866,53.983],[84.225,55.886,94.866,61.356],[84.225,63.377,94.866,68.966],[84.225,70.868,94.866,77.051],
+[87.701,80.856,97.861,92.747],
+[80.749,78.478,85.829,92.747],[74.064,78.478,79.679,92.747],[67.647,78.478,72.995,92.747],[61.337,78.478,66.631,92.747],[56.043,78.478,60.321,92.747],[50.107,78.478,55.080,92.747],[44.171,78.478,48.984,92.747],[37.647,78.478,43.048,92.747],[31.283,78.478,36.524,92.747],[25.241,78.478,30.160,92.747],[18.770,78.478,24.118,92.747],[12.139,78.478,17.647,92.747],
+[1.872,78.478,10.428,92.747],
+[6.150,68.133,14.706,74.792],[6.417,61.118,14.866,66.350],[6.684,54.102,14.973,59.334],[6.952,47.206,15.080,52.319],[7.219,40.190,15.241,45.303],[7.487,33.294,15.401,38.407],[7.754,26.278,15.508,31.391],[8.021,19.263,15.775,24.376]
 ];
-var SLOTS={
- top:[[-1.55,-.15],[0,-.15],[1.55,-.15],[-1.55,1.25],[0,1.25],[1.55,1.25]],
- right:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]],
- bottom:[[-1.55,-1.15],[0,-1.15],[1.55,-1.15],[-1.55,.55],[0,.55],[1.55,.55]],
- left:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]]
-};
+var POS=CELL_RECTS.map(function(r){return [(r[0]+r[2])/2,(r[1]+r[3])/2]});
+var SLOT_LAYOUT=[
+[0.23,0.62],[0.50,0.62],[0.77,0.62],
+[0.23,0.90],[0.50,0.90],[0.77,0.90]
+];
+function base(i,slot){
+  var r=CELL_RECTS[i]||CELL_RECTS[0],o=SLOT_LAYOUT[(Number(slot)||0)%SLOT_LAYOUT.length];
+  return [r[0]+(r[2]-r[0])*o[0],r[1]+(r[3]-r[1])*o[1]];
+}
+function marker(i,type){
+  var r=CELL_RECTS[i]||CELL_RECTS[0],f=type==='owner'?.16:.84;
+  return [r[0]+(r[2]-r[0])*f,r[1]+(r[3]-r[1])*.88];
+}
 var EVENTS=[
 ['Quest Lendária','Receba 150 N por concluir uma missão Rank S.','plus150'],
 ['Ordem da Guarda Real','Vá diretamente para o Calabouço Real.','jail'],
@@ -81,8 +93,6 @@ function $(id){return document.getElementById(id)}
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function cash(n){return Math.max(0,Math.round(n)).toLocaleString('pt-BR')+' N'}
 function delay(ms){return new Promise(function(r){setTimeout(r,ms)})}
-function side(i){return i<=10?'top':i<=18?'right':i<=30?'bottom':'left'}
-function base(i,slot){var p=POS[i],o=SLOTS[side(i)][slot%6];return [p[0]+o[0],p[1]+o[1]]}
 function me(){return state&&state.players.find(function(p){return p.peerId===ctx.selfId})}
 function current(){return state&&state.players[state.turn]}
 function isMyTurn(){return !!(state&&current()&&current().peerId===ctx.selfId)}
@@ -139,7 +149,7 @@ function createState(room){
   var players=room.players.slice().sort(function(a,b){return a.slot-b.slot}).map(function(p){
     return {peerId:p.peerId,name:p.name,piece:p.piece,color:p.color,slot:p.slot,money:initial,pos:0,props:[],jail:false,jailTurns:0,key:0,doubles:0,dead:false};
   });
-  return {version:1,roomCode:room.code,config:room.config,players:players,turn:0,round:1,dice:[1,1],phase:'roll',pending:null,bonusRoll:false,assets:{}};
+  return {version:2,roomCode:room.code,config:room.config,players:players,turn:0,round:1,dice:[1,1],phase:'roll',pending:null,bonusRoll:false,assets:{}};
 }
 function handleNet(msg,from){
   if(!msg||!msg.type)return;
@@ -171,7 +181,7 @@ function render(){
 function renderPlayers(){
   $('ngoPlayerList').innerHTML=state.players.map(function(p,i){
     return '<div class="ngo-player '+(i===state.turn?'active':'')+'" style="--pc:'+p.color+'">'+
-      '<span class="ngo-player-piece"><img src="'+PIECES[p.piece]+'?v=106" alt=""></span>'+
+      '<span class="ngo-player-piece"><img src="'+PIECES[p.piece]+'?v=122" alt=""></span>'+
       '<b>'+escapeHtml(p.name)+(p.jail?' 🔒':'')+'</b><span class="ngo-money">'+cash(p.money)+'</span></div>';
   }).join('');
 }
@@ -181,7 +191,7 @@ function renderTokens(){
     if(p.dead)return;
     var xy=base(p.pos,p.slot),t=document.createElement('div');t.className='ngo-token'+(p.peerId===ctx.selfId?' me':'');
     t.style.left=xy[0]+'%';t.style.top=xy[1]+'%';t.style.setProperty('--pc',p.color);
-    t.innerHTML='<img src="'+PIECES[p.piece]+'?v=106" alt="">';e.appendChild(t);
+    t.innerHTML='<img src="'+PIECES[p.piece]+'?v=122" alt="">';e.appendChild(t);
   });
 }
 function renderOwners(){
@@ -189,9 +199,9 @@ function renderOwners(){
   Object.keys(state.assets).forEach(function(k){
     var a=state.assets[k];if(a.owner==null)return;
     var idx=Number(k),p=state.players[a.owner],xy=POS[idx],flag=document.createElement('div');
-    flag.className='ngo-owner';flag.style.left='calc('+xy[0]+'% - .85cqw)';flag.style.top='calc('+xy[1]+'% + .78cqw)';flag.style.setProperty('--pc',p.color);e.appendChild(flag);
+    var op=marker(idx,'owner');flag.className='ngo-owner';flag.style.left=op[0]+'%';flag.style.top=op[1]+'%';flag.style.setProperty('--pc',p.color);e.appendChild(flag);
     if(a.h){
-      var b=document.createElement('div');b.className='ngo-buildings';b.style.left='calc('+xy[0]+'% + .78cqw)';b.style.top='calc('+xy[1]+'% + .78cqw)';b.style.setProperty('--pc',p.color);
+      var bp=marker(idx,'build');var b=document.createElement('div');b.className='ngo-buildings';b.style.left=bp[0]+'%';b.style.top=bp[1]+'%';b.style.setProperty('--pc',p.color);
       if(a.h>=5){var hotel=document.createElement('i');hotel.className='ngo-hotel';b.appendChild(hotel)}
       else for(var h=0;h<a.h;h++){var q=document.createElement('i');q.className='ngo-house';b.appendChild(q)}
       e.appendChild(b);
@@ -271,7 +281,7 @@ async function hostRoll(){
   }
   if(a===b){p.doubles++;if(p.doubles>=3){hostJail(state.turn);broadcast();return}}else p.doubles=0;
   for(var i=0;i<sum;i++){
-    p.pos=(p.pos+1)%40;if(p.pos===0){p.money+=200;notice(p.name+' passou pelo Portal e recebeu 200 N.')}
+    p.pos=(p.pos+1)%S.length;if(p.pos===0){p.money+=200;notice(p.name+' passou pelo Portal e recebeu 200 N.')}
     broadcast();await delay(210);
   }
   await hostLand(sum,a===b);
@@ -404,7 +414,7 @@ async function hostCard(kind,pi){
   var p=state.players[pi],e=c[2];
   if(e==='plus150')p.money+=150;else if(e==='plus200')p.money+=200;else if(e==='plus50')p.money+=50;
   else if(e==='minus100')hostPay(pi,100,null);else if(e==='key')p.key++;
-  else if(e==='back3')p.pos=(p.pos+37)%40;else if(e==='jail')hostJail(pi);
+  else if(e==='back3')p.pos=(p.pos-3+S.length)%S.length;else if(e==='jail')hostJail(pi);
   else if(e==='each30'||e==='each20'){var v=e==='each30'?30:20;state.players.forEach(function(q,j){if(j!==pi&&!q.dead){var amt=Math.min(q.money,v);q.money-=amt;p.money+=amt}})}
 }
 function showCard(title,text){modal(title,text,[['Continuar','purple',closeModal]])}
