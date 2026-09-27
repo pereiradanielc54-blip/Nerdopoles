@@ -117,6 +117,7 @@ function showMenuControls(){
 }
 function hideMenuControls(){if($('roomMenuControls'))$('roomMenuControls').style.display='none'}
 function showMenu(push){
+  stopBrowserScan();
   closeJoinModal();
   hideRoomScreen();
   setArt(MENU);
@@ -366,7 +367,7 @@ function roomRowHtml(r){
   '</article>';
 }
 function renderBrowserRooms(){
-  var list=browserRooms.slice().filter(function(r){return r&&r.code&&r.players<r.maxPlayers});
+  var list=browserRooms.slice().filter(function(r){return r&&r.code});
   list.sort(function(a,b){
     var af=isFriendRoom(a)?1:0,bf=isFriendRoom(b)?1:0;
     if(af!==bf)return bf-af;
