@@ -232,9 +232,9 @@ function renderOwners(){
   if(!game)return;var e=document.getElementById('ngOwners');if(!e)return;e.innerHTML='';
   Object.keys(game.a).forEach(function(k){
     var a=game.a[k];if(a.owner==null)return;var idx=Number(k),p=game.p[a.owner],flag=document.createElement('div');
-    flag.className='ng-owner-flag';flag.style.left='calc('+positions[idx][0]+'% - 13px)';flag.style.top='calc('+positions[idx][1]+'% + 12px)';flag.style.setProperty('--c',p.c);e.appendChild(flag);
+    flag.className='ng-owner-flag';flag.style.left='calc('+positions[idx][0]+'% - .85cqw)';flag.style.top='calc('+positions[idx][1]+'% + .78cqw)';flag.style.setProperty('--c',p.c);e.appendChild(flag);
     if(a.h){
-      var b=document.createElement('div');b.className='ng-buildings';b.style.left='calc('+positions[idx][0]+'% + 12px)';b.style.top='calc('+positions[idx][1]+'% + 12px)';b.style.setProperty('--owner',p.c);
+      var b=document.createElement('div');b.className='ng-buildings';b.style.left='calc('+positions[idx][0]+'% + .78cqw)';b.style.top='calc('+positions[idx][1]+'% + .78cqw)';b.style.setProperty('--owner',p.c);
       if(a.h>=5){var hotel=document.createElement('i');hotel.className='ng-hotel-mini';b.appendChild(hotel)}
       else for(var h=0;h<a.h;h++){var house=document.createElement('i');house.className='ng-house-mini';b.appendChild(house)}
       e.appendChild(b);
