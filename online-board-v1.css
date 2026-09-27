@@ -3,10 +3,10 @@
 #ngoBoard.on{display:block}
 #ngoTokens,#ngoOwners{position:absolute;inset:0;pointer-events:none}
 #ngoOwners{z-index:42}#ngoTokens{z-index:58}
-.ngo-token{position:absolute;transform:translate(-50%,-100%);transform-origin:50% 100%;width:clamp(34px,4cqw,62px);height:clamp(36px,4.2cqw,66px);z-index:60;filter:drop-shadow(0 6px 6px #000d);transition:left .28s cubic-bezier(.2,.75,.2,1),top .28s cubic-bezier(.2,.75,.2,1)}
-.ngo-token.me{z-index:66;transform:translate(-50%,-100%) scale(1.16)}
+.ngo-token{position:absolute;--piece-anchor-y:86.5%;transform:translate(-50%,-86.5%);transform-origin:50% 86.5%;width:clamp(34px,4cqw,62px);height:clamp(36px,4.2cqw,66px);z-index:60;filter:drop-shadow(0 6px 6px #000d);transition:left .28s cubic-bezier(.2,.75,.2,1),top .28s cubic-bezier(.2,.75,.2,1)}
+.ngo-token.me{z-index:66;transform:translate(-50%,-86.5%) scale(1.16)}
 .ngo-token img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
-.ngo-token:after{content:"";position:absolute;left:18%;right:18%;bottom:-3px;height:7px;border-radius:50%;background:radial-gradient(ellipse,var(--pc),transparent 68%);opacity:.55;filter:blur(1px)}
+.ngo-token:after{display:none}
 .ngo-owner{position:absolute;transform:translate(-50%,-50%);width:clamp(8px,.8cqw,12px);height:clamp(11px,1.05cqw,16px);background:var(--pc);clip-path:polygon(0 0,100% 16%,70% 48%,100% 80%,0 100%);filter:drop-shadow(0 2px 2px #000a)}
 .ngo-buildings{position:absolute;transform:translate(-50%,-50%);display:flex;gap:1px;align-items:flex-end}
 .ngo-house{position:relative;width:clamp(8px,.72cqw,12px);height:clamp(7px,.64cqw,10px);background:var(--pc);border:1px solid #fff;border-radius:1px}
