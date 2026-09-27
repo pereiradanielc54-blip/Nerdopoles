@@ -97,7 +97,8 @@ function changePrivatePassword(){
 }
 function setArt(src){
   if(art)art.src=src;
-  if(frame&&stage){
+  if(window.NerdFit)window.NerdFit();
+  else if(frame&&stage){
     var w=stage.clientWidth,h=stage.clientHeight,r=16/9,fw=w,fh=fw/r;
     if(fh>h){fh=h;fw=fh*r}
     frame.style.width=fw+'px';frame.style.height=fh+'px';
