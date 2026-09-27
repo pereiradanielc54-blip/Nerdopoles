@@ -219,11 +219,6 @@ function renderTokens(){
     fallback.textContent=FALLBACK[p.piece]||'◆';
     t.appendChild(fallback);
 
-    var badge=document.createElement('i');
-    badge.className='token-badge';
-    badge.style.setProperty('--c',p.c||COLORS[k%COLORS.length]);
-    t.appendChild(badge);
-
     var src=pieceSprites[p.piece];
     if(src){
       var im=document.createElement('img');
