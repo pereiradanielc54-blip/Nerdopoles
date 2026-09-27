@@ -33,9 +33,11 @@ var BUILDS=[
   {label:'Estratégica',desc:'Construções custam mais e exigem planejamento.'}
 ];
 
-var setup={maxPlayers:4,map:0,piece:0,duration:1,money:1,build:1,trades:false,auctions:false,events:false,private:false};
-var layer=null,setupUI=null,lobbyUI=null,toastEl=null,joinModal=null;
+var setup={maxPlayers:4,map:0,piece:0,duration:1,money:1,build:1,trades:false,auctions:false,events:false,private:false,password:''};
+var layer=null,setupUI=null,lobbyUI=null,browserUI=null,toastEl=null,joinModal=null;
 var peer=null,hostConn=null,connections={},room=null,isHost=false,selfId=null,gameListeners=[];
+var directoryPeer=null,directorySlot=null,browserPeer=null,browserRooms=[],scanToken=0,roomPassword='',pendingJoin=null;
+var DIRECTORY_SLOTS=24;
 var art,frame,stage,baseConfig,play;
 var toastTimer=null;
 
@@ -55,6 +57,44 @@ function savePlayerName(n){
   if(n)localStorage.setItem('nerdopoles-player-name',n);
   return n||'Jogador';
 }
+function friendNames(){
+  var out=[];
+  try{
+    var raw=JSON.parse(localStorage.getItem('nerdopoles-friends')||'[]');
+    if(Array.isArray(raw))raw.forEach(function(x){out.push(String(typeof x==='string'?x:(x.name||x.username||x.displayName||'')).trim().toLowerCase())});
+  }catch(_){}
+  try{
+    if(window.NerdoraSocial&&Array.isArray(window.NerdoraSocial.friends)){
+      window.NerdoraSocial.friends.forEach(function(x){out.push(String(typeof x==='string'?x:(x.name||x.username||x.displayName||'')).trim().toLowerCase())});
+    }
+  }catch(_){}
+  return out.filter(Boolean);
+}
+function isFriendRoom(r){
+  var friends=friendNames(),host=String(r&&r.hostName||'').trim().toLowerCase();
+  return !!host&&friends.indexOf(host)>=0;
+}
+function beaconId(n){return 'nerdopoles-list-'+String(n).padStart(2,'0')}
+function setPrivateMode(){
+  if(!setup.private){
+    var pwd=prompt('Defina uma senha para a sala privada (4 a 12 caracteres):',setup.password||'');
+    if(pwd===null)return;
+    pwd=String(pwd).trim().slice(0,12);
+    if(pwd.length<4){toast('A senha precisa ter pelo menos 4 caracteres.');return}
+    setup.private=true;setup.password=pwd;
+  }else{
+    setup.private=false;setup.password='';
+  }
+  renderSetup();
+}
+function changePrivatePassword(){
+  if(!setup.private){setPrivateMode();return}
+  var pwd=prompt('Nova senha da sala privada:',setup.password||'');
+  if(pwd===null)return;
+  pwd=String(pwd).trim().slice(0,12);
+  if(pwd.length<4){toast('A senha precisa ter pelo menos 4 caracteres.');return}
+  setup.password=pwd;renderSetup();
+}
 function setArt(src){
   if(art)art.src=src;
   if(frame&&stage){
@@ -73,7 +113,7 @@ function showMenuControls(){
   if(!layer)return;
   layer.classList.add('on');
   $('roomMenuControls').style.display='block';
-  setupUI.classList.remove('on');lobbyUI.classList.remove('on');
+  setupUI.classList.remove('on');lobbyUI.classList.remove('on');if(browserUI)browserUI.classList.remove('on');
 }
 function hideMenuControls(){if($('roomMenuControls'))$('roomMenuControls').style.display='none'}
 function showMenu(push){
@@ -85,16 +125,27 @@ function showMenu(push){
   if(push)history.pushState({screen:'menu'},'',location.pathname);
 }
 function showSetup(push){
+  stopBrowserScan();
   hideBase();setArt(CREATE_ROOM);
   layer.classList.add('on');hideMenuControls();
-  setupUI.classList.add('on');lobbyUI.classList.remove('on');
+  setupUI.classList.add('on');lobbyUI.classList.remove('on');if(browserUI)browserUI.classList.remove('on');
   renderSetup();
   if(push)history.pushState({screen:'room-setup'},'','#criar-sala');
 }
+function showBrowser(push,skipScan){
+  hideBase();setArt(MENU);
+  layer.classList.add('on');hideMenuControls();
+  setupUI.classList.remove('on');lobbyUI.classList.remove('on');browserUI.classList.add('on');
+  $('browserName').value=playerName()==='Jogador'?'':playerName();
+  $('browserStatus').textContent='Salas que ainda não iniciaram a partida';
+  if(push)history.pushState({screen:'multiplayer-browser'},'','#multiplayer');
+  if(!skipScan)scanRooms();
+}
 function showLobby(push){
+  stopBrowserScan();
   hideBase();setArt(LOBBY);
   layer.classList.add('on');hideMenuControls();
-  setupUI.classList.remove('on');lobbyUI.classList.add('on');
+  setupUI.classList.remove('on');lobbyUI.classList.add('on');if(browserUI)browserUI.classList.remove('on');
   renderLobby();
   if(push)history.pushState({screen:'room-lobby'},'','#sala-lobby');
 }
@@ -104,7 +155,7 @@ function showOnlineBoard(push){
   if(push)history.pushState({screen:'online-board'},'','#tabuleiro-online');
 }
 function hideRoomScreen(){
-  if(layer){setupUI.classList.remove('on');lobbyUI.classList.remove('on')}
+  if(layer){setupUI.classList.remove('on');lobbyUI.classList.remove('on');if(browserUI)browserUI.classList.remove('on')}
 }
 function toast(msg){
   if(!toastEl)return;toastEl.textContent=msg;toastEl.classList.add('show');
@@ -123,9 +174,24 @@ function mount(){
   layer=document.createElement('div');layer.id='roomLayer';layer.className='on';
   layer.innerHTML=
   '<div id="roomMenuControls">'+
-    '<button id="roomJoinHot" class="room-hot" aria-label="Entrar em sala multiplayer"></button>'+
+    '<button id="roomJoinHot" class="room-hot" aria-label="Multiplayer"></button>'+
+    '<button id="roomQuickHot" class="room-hot" aria-label="Partida rápida"></button>'+
     '<button id="roomCreateHot" class="room-hot" aria-label="Criar sala"></button>'+
   '</div>'+
+  '<section id="roomBrowserUI">'+
+    '<button id="browserBack" class="browser-back">← VOLTAR</button>'+
+    '<div class="browser-shell">'+
+      '<div class="browser-head"><div><h2>MULTIPLAYER</h2><p>Entre por código ou escolha uma sala aguardando jogadores.</p></div><button id="browserRefresh" class="browser-small-btn">↻ Atualizar</button></div>'+
+      '<div class="browser-code-card">'+
+        '<input id="browserName" class="browser-input" maxlength="18" placeholder="SEU NOME">'+
+        '<input id="browserCode" class="browser-input code" maxlength="6" placeholder="CÓDIGO">'+
+        '<input id="browserPassword" class="browser-input" maxlength="12" placeholder="SENHA (SE PRIVADA)">'+
+        '<button id="browserJoinCode" class="browser-primary">ENTRAR PELO CÓDIGO</button>'+
+      '</div>'+
+      '<div class="browser-tools"><span id="browserStatus">Procurando salas...</span><button id="browserQuick" class="browser-quick">⚡ PARTIDA RÁPIDA</button></div>'+
+      '<div id="browserRooms" class="browser-rooms"></div>'+
+    '</div>'+
+  '</section>'+
   '<section id="roomSetupUI">'+
     '<button id="roomBack" class="room-hot" aria-label="Voltar"></button>'+
     '<button class="room-choice room-count" data-v="2"></button><button class="room-choice room-count" data-v="3"></button><button class="room-choice room-count" data-v="4"></button><button class="room-choice room-count" data-v="5"></button><button class="room-choice room-count" data-v="6"></button>'+
@@ -137,7 +203,7 @@ function mount(){
     '<button id="roomDurPrev" class="room-arrow"></button><button id="roomDurNext" class="room-arrow"></button><div id="roomDurValue" class="room-setting-value"></div><div id="roomDurDesc" class="room-setting-desc"></div>'+
     '<button id="roomMoneyPrev" class="room-arrow"></button><button id="roomMoneyNext" class="room-arrow"></button><div id="roomMoneyValue" class="room-setting-value"></div><div id="roomMoneyDesc" class="room-setting-desc"></div>'+
     '<button id="roomBuildPrev" class="room-arrow"></button><button id="roomBuildNext" class="room-arrow"></button><div id="roomBuildValue" class="room-setting-value"></div><div id="roomBuildDesc" class="room-setting-desc"></div>'+
-    '<button id="roomTrades" class="room-toggle"></button><button id="roomAuctions" class="room-toggle"></button><button id="roomEvents" class="room-toggle"></button><button id="roomPrivate" class="room-toggle"></button>'+
+    '<button id="roomTrades" class="room-toggle"></button><button id="roomAuctions" class="room-toggle"></button><button id="roomEvents" class="room-toggle"></button><button id="roomPrivate" class="room-toggle"></button><button id="roomPrivateInfo" class="room-private-info" type="button"></button>'+
     '<button id="roomCreate" class="room-hot ready" aria-label="Criar sala"></button>'+
   '</section>'+
   '<section id="roomLobbyUI">'+
@@ -157,10 +223,11 @@ function mount(){
   '</div></div>';
   frame.appendChild(layer);
 
-  setupUI=$('roomSetupUI');lobbyUI=$('roomLobbyUI');toastEl=$('roomToast');joinModal=$('roomJoinModal');
+  setupUI=$('roomSetupUI');lobbyUI=$('roomLobbyUI');browserUI=$('roomBrowserUI');toastEl=$('roomToast');joinModal=$('roomJoinModal');
 
   /* Hotspots do menu oficial */
   $('roomJoinHot').style.cssText='left:1.55%;top:31.8%;width:21.7%;height:8.8%;';
+  $('roomQuickHot').style.cssText='left:1.55%;top:41.6%;width:21.7%;height:8.8%;';
   $('roomCreateHot').style.cssText='left:1.55%;top:51.4%;width:21.7%;height:8.7%;';
 
   bindUI();
@@ -170,7 +237,14 @@ function mount(){
 
 function bindUI(){
   $('roomCreateHot').onclick=function(){showSetup(true)};
-  $('roomJoinHot').onclick=openJoinModal;
+  $('roomJoinHot').onclick=function(){showBrowser(true,false)};
+  $('roomQuickHot').onclick=function(){quickMatch(true)};
+  $('browserBack').onclick=function(){showMenu(true)};
+  $('browserRefresh').onclick=scanRooms;
+  $('browserQuick').onclick=function(){quickMatch(false)};
+  $('browserJoinCode').onclick=joinFromBrowser;
+  $('browserCode').addEventListener('input',function(){this.value=normalizeCode(this.value)});
+  $('browserCode').addEventListener('keydown',function(e){if(e.key==='Enter')joinFromBrowser()});
   if(play)play.addEventListener('click',function(){layer.classList.remove('on')});
 
   $('roomBack').onclick=function(){showMenu(true)};
@@ -183,7 +257,7 @@ function bindUI(){
   $('roomDurPrev').onclick=function(){cycle('duration',DURATIONS,-1)};$('roomDurNext').onclick=function(){cycle('duration',DURATIONS,1)};
   $('roomMoneyPrev').onclick=function(){cycle('money',MONEY,-1)};$('roomMoneyNext').onclick=function(){cycle('money',MONEY,1)};
   $('roomBuildPrev').onclick=function(){cycle('build',BUILDS,-1)};$('roomBuildNext').onclick=function(){cycle('build',BUILDS,1)};
-  $('roomTrades').onclick=function(){toggle('trades')};$('roomAuctions').onclick=function(){toggle('auctions')};$('roomEvents').onclick=function(){toggle('events')};$('roomPrivate').onclick=function(){toggle('private')};
+  $('roomTrades').onclick=function(){toggle('trades')};$('roomAuctions').onclick=function(){toggle('auctions')};$('roomEvents').onclick=function(){toggle('events')};$('roomPrivate').onclick=setPrivateMode;$('roomPrivateInfo').onclick=changePrivatePassword;
   $('roomCreate').onclick=createRoom;
 
   $('lobbyBack').onclick=leaveRoom;
@@ -200,6 +274,7 @@ function bindUI(){
   window.addEventListener('popstate',function(){
     var h=location.hash;
     if(h==='#criar-sala'){showSetup(false);return}
+    if(h==='#multiplayer'){showBrowser(false,false);return}
     if(h==='#sala-lobby'&&room){showLobby(false);return}
     if(h==='#tabuleiro-online'){showOnlineBoard(false);return}
     if(!h||h==='#'){showMenuControls()}
@@ -219,6 +294,168 @@ function renderSetup(){
   $('roomBuildValue').textContent=BUILDS[setup.build].label;$('roomBuildDesc').textContent=BUILDS[setup.build].desc;
 
   [['roomTrades','trades'],['roomAuctions','auctions'],['roomEvents','events'],['roomPrivate','private']].forEach(function(x){$(x[0]).classList.toggle('on',!!setup[x[1]])});
+  $('roomPrivateInfo').textContent=setup.private?(setup.password?'Senha definida · alterar':'Definir senha'):'';
+  $('roomPrivateInfo').classList.toggle('visible',!!setup.private);
+}
+
+function stopBrowserScan(){
+  scanToken++;
+  try{if(browserPeer)browserPeer.destroy()}catch(_){}
+  browserPeer=null;
+}
+function roomAdvert(){
+  if(!room||room.started)return null;
+  var host=room.players&&room.players.find(function(p){return p.host})||room.players&&room.players[0];
+  return {
+    code:room.code,
+    hostName:host?host.name:'Anfitrião',
+    private:!!room.config.private,
+    players:room.players.length,
+    maxPlayers:room.config.maxPlayers,
+    map:room.config.map,
+    mapName:MAPS[room.config.map]?MAPS[room.config.map].name:'Cidade de Nerdora',
+    duration:DURATIONS[room.config.duration]?DURATIONS[room.config.duration].label:'Clássica',
+    createdAt:room.createdAt||Date.now(),
+    beaconSlot:directorySlot
+  };
+}
+function destroyDirectory(){
+  try{if(directoryPeer)directoryPeer.destroy()}catch(_){}
+  directoryPeer=null;directorySlot=null;
+}
+function openBeacon(slot){
+  return new Promise(function(resolve,reject){
+    var p=new Peer(beaconId(slot)),done=false;
+    var timer=setTimeout(function(){if(done)return;done=true;try{p.destroy()}catch(_){};reject(new Error('timeout'))},2200);
+    p.on('open',function(){
+      if(done)return;done=true;clearTimeout(timer);resolve(p);
+    });
+    p.on('error',function(err){
+      if(done)return;done=true;clearTimeout(timer);try{p.destroy()}catch(_){};reject(err);
+    });
+  });
+}
+async function claimDirectoryBeacon(){
+  destroyDirectory();
+  var order=[],start=Math.floor(Math.random()*DIRECTORY_SLOTS);
+  for(var i=0;i<DIRECTORY_SLOTS;i++)order.push(((start+i)%DIRECTORY_SLOTS)+1);
+  for(var j=0;j<order.length;j++){
+    try{
+      var p=await openBeacon(order[j]);
+      directoryPeer=p;directorySlot=order[j];
+      p.on('connection',function(conn){
+        conn.on('open',function(){
+          var adv=roomAdvert();
+          if(adv)try{conn.send({type:'room_advert',room:adv})}catch(_){}
+        });
+      });
+      p.on('error',function(){});
+      return true;
+    }catch(_){}
+  }
+  return false;
+}
+function roomRowHtml(r){
+  var friend=isFriendRoom(r),full=r.players>=r.maxPlayers;
+  return '<article class="browser-room '+(friend?'friend ':'')+(full?'full':'')+'" data-code="'+escapeHtml(r.code)+'">'+
+    '<div class="browser-room-icon">'+(friend?'★':(r.private?'🔒':'🎲'))+'</div>'+
+    '<div class="browser-room-main"><div class="browser-room-title">'+escapeHtml(r.hostName)+(friend?' <span>AMIGO</span>':'')+'</div>'+
+      '<div class="browser-room-meta">'+escapeHtml(r.mapName)+' · '+escapeHtml(r.duration)+' · '+r.players+'/'+r.maxPlayers+' jogadores</div></div>'+
+    '<div class="browser-room-type">'+(r.private?'PRIVADA':'PÚBLICA')+'</div>'+
+    '<button class="browser-room-join" '+(full?'disabled':'')+'>'+(full?'CHEIA':(r.private?'SENHA':'ENTRAR'))+'</button>'+
+  '</article>';
+}
+function renderBrowserRooms(){
+  var list=browserRooms.slice().filter(function(r){return r&&r.code&&r.players<r.maxPlayers});
+  list.sort(function(a,b){
+    var af=isFriendRoom(a)?1:0,bf=isFriendRoom(b)?1:0;
+    if(af!==bf)return bf-af;
+    return (a.createdAt||0)-(b.createdAt||0);
+  });
+  var box=$('browserRooms');
+  if(!list.length){
+    box.innerHTML='<div class="browser-empty"><b>Nenhuma sala disponível agora.</b><span>Você pode entrar por código, atualizar a lista ou criar uma nova sala.</span></div>';
+  }else{
+    box.innerHTML=list.map(roomRowHtml).join('');
+    box.querySelectorAll('.browser-room').forEach(function(row){
+      var btn=row.querySelector('.browser-room-join');
+      if(btn&&!btn.disabled)btn.onclick=function(){
+        var code=row.dataset.code,adv=list.find(function(x){return x.code===code});
+        joinAdvertisedRoom(adv);
+      };
+    });
+  }
+  $('browserStatus').textContent=list.length?(list.length+' sala'+(list.length===1?'':'s')+' aguardando jogadores'):'Nenhuma sala pública ou privada encontrada';
+}
+function probeRoom(slot,token){
+  return new Promise(function(resolve){
+    if(!browserPeer||token!==scanToken){resolve(null);return}
+    var done=false,conn;
+    function finish(v){
+      if(done)return;done=true;
+      try{if(conn)conn.close()}catch(_){}
+      resolve(v||null);
+    }
+    try{
+      conn=browserPeer.connect(beaconId(slot),{reliable:true,metadata:{purpose:'browser'}});
+      conn.on('data',function(msg){
+        if(msg&&msg.type==='room_advert'&&msg.room)finish(msg.room);
+      });
+      conn.on('error',function(){finish(null)});
+      conn.on('close',function(){setTimeout(function(){finish(null)},20)});
+      setTimeout(function(){finish(null)},1250);
+    }catch(_){finish(null)}
+  });
+}
+async function scanRooms(){
+  if(typeof Peer==='undefined'){if($('browserStatus'))$('browserStatus').textContent='Multiplayer indisponível neste carregamento.';return []}
+  stopBrowserScan();
+  browserRooms=[];
+  var token=scanToken;
+  if($('browserStatus'))$('browserStatus').textContent='Procurando salas abertas...';
+  try{
+    browserPeer=new Peer();
+    await new Promise(function(resolve,reject){
+      var done=false,t=setTimeout(function(){if(!done){done=true;reject(new Error('timeout'))}},4500);
+      browserPeer.on('open',function(){if(done)return;done=true;clearTimeout(t);resolve()});
+      browserPeer.on('error',function(err){if(err&&err.type!=='peer-unavailable'&&!done){done=true;clearTimeout(t);reject(err)}});
+    });
+    var jobs=[];
+    for(var i=1;i<=DIRECTORY_SLOTS;i++)jobs.push(probeRoom(i,token));
+    var found=await Promise.all(jobs);
+    if(token!==scanToken)return [];
+    var seen={};
+    found.forEach(function(r){if(r&&r.code&&!seen[r.code]){seen[r.code]=true;browserRooms.push(r)}});
+    renderBrowserRooms();
+    return browserRooms.slice();
+  }catch(_){
+    if(token===scanToken&&$('browserStatus'))$('browserStatus').textContent='Não foi possível atualizar as salas. Tente novamente.';
+    return [];
+  }
+}
+function joinAdvertisedRoom(adv){
+  if(!adv)return;
+  var pwd='';
+  if(adv.private){
+    pwd=prompt('Sala privada de '+adv.hostName+'. Digite a senha:','')||'';
+    if(!pwd)return;
+  }
+  connectToRoom(adv.code,pwd,$('browserName').value||playerName(),function(msg){$('browserStatus').textContent=msg});
+}
+function joinFromBrowser(){
+  var code=normalizeCode($('browserCode').value),pwd=$('browserPassword').value||'',name=$('browserName').value||playerName();
+  if(code.length!==6){$('browserStatus').textContent='Digite um código de 6 caracteres.';return}
+  connectToRoom(code,pwd,name,function(msg){$('browserStatus').textContent=msg});
+}
+async function quickMatch(fromMenu){
+  if(fromMenu)showBrowser(true,true);
+  $('browserStatus').textContent='Buscando uma sala pública livre...';
+  var rooms=await scanRooms();
+  var open=rooms.filter(function(r){return !r.private&&r.players<r.maxPlayers});
+  if(!open.length){$('browserStatus').textContent='Nenhuma sala pública livre agora. Você pode criar uma sala ou atualizar a lista.';return}
+  var pick=open[Math.floor(Math.random()*open.length)];
+  $('browserStatus').textContent='Partida encontrada com '+pick.hostName+'. Entrando...';
+  connectToRoom(pick.code,'',$('browserName').value||playerName(),function(msg){$('browserStatus').textContent=msg});
 }
 
 function openJoinModal(){
@@ -248,6 +485,7 @@ function makeConfig(){
 }
 async function createRoom(){
   if(typeof Peer==='undefined'){toast('Módulo multiplayer não carregou. Feche e abra o jogo novamente.');return}
+  if(setup.private&&String(setup.password||'').length<4){toast('Defina a senha da sala privada antes de criar.');return}
   $('roomCreate').classList.add('disabled');
   destroyPeer();
   isHost=true;
@@ -259,10 +497,14 @@ async function createRoom(){
       await openHostPeer(code);
       var hostName=localStorage.getItem('nerdopoles-player-name')||'Anfitrião';
       room={
-        code:code,hostPeerId:selfId,config:makeConfig(),
+        code:code,hostPeerId:selfId,config:makeConfig(),createdAt:Date.now(),started:false,
         players:[{peerId:selfId,name:hostName,slot:0,piece:setup.piece,color:SLOT_COLORS[0],host:true}]
       };
-      showLobby(true);broadcastRoom();$('roomCreate').classList.remove('disabled');return;
+      roomPassword=setup.private?setup.password:'';
+      var listed=await claimDirectoryBeacon();
+      showLobby(true);broadcastRoom();
+      if(!listed)toast('Sala criada. A entrada por código funciona, mas a listagem automática ficou indisponível.');
+      $('roomCreate').classList.remove('disabled');return;
     }catch(e){
       destroyPeer();
       if(attempts>=5){toast('Não foi possível criar a sala. Tente novamente.')}
@@ -293,7 +535,8 @@ function acceptConnection(conn){
 function handleHostMessage(conn,msg){
   if(!msg||typeof msg!=='object')return;
   if(msg.type==='join'){
-    if(!room){conn.send({type:'reject',reason:'Sala indisponível.'});return}
+    if(!room||room.started){conn.send({type:'reject',reason:'A partida já começou ou a sala não está disponível.'});return}
+    if(room.config.private&&String(msg.password||'')!==String(roomPassword||'')){conn.send({type:'reject',reason:'Senha incorreta para esta sala privada.'});return}
     var existing=room.players.find(function(p){return p.peerId===conn.peer});
     if(existing){conn.send({type:'room_state',room:clone(room)});return}
     if(room.players.length>=room.config.maxPlayers){conn.send({type:'reject',reason:'A sala está cheia.'});return}
@@ -331,35 +574,48 @@ function sendAll(msg){
 function joinRoom(){
   var name=savePlayerName($('joinName').value||'Jogador'),code=normalizeCode($('joinCode').value);
   if(code.length!==6){joinError('Digite o código de 6 caracteres.');return}
-  if(typeof Peer==='undefined'){joinError('O multiplayer não carregou. Feche e abra o jogo novamente.');return}
-  joinError('Conectando...');
-  destroyPeer();isHost=false;
+  connectToRoom(code,'',name,joinError);
+}
+function connectToRoom(code,password,name,onError){
+  code=normalizeCode(code);name=savePlayerName(name||'Jogador');
+  if(code.length!==6){if(onError)onError('Código inválido.');return}
+  if(typeof Peer==='undefined'){if(onError)onError('O multiplayer não carregou. Feche e abra o jogo novamente.');return}
+  stopBrowserScan();destroyPeer();isHost=false;
+  if(onError)onError('Conectando à sala '+code+'...');
   peer=new Peer();
-  var timed=false,timer=setTimeout(function(){timed=true;joinError('Sala não encontrada ou anfitrião offline.');destroyPeer()},9000);
+  var finished=false;
+  var timer=setTimeout(function(){
+    if(finished)return;finished=true;
+    if(onError)onError('Sala não encontrada ou anfitrião offline.');
+    destroyPeer();
+  },9000);
+  pendingJoin={
+    error:function(msg){if(onError)onError(msg)},
+    success:function(){clearTimeout(timer);finished=true;closeJoinModal()}
+  };
   peer.on('open',function(id){
-    if(timed)return;selfId=id;
+    if(finished)return;selfId=id;
     hostConn=peer.connect('nerdopoles-'+code.toLowerCase(),{reliable:true});
-    hostConn.on('open',function(){hostConn.send({type:'join',name:name})});
+    hostConn.on('open',function(){hostConn.send({type:'join',name:name,password:String(password||'')})});
     hostConn.on('data',handleGuestMessage);
-    hostConn.on('close',function(){if(room){toast('O anfitrião saiu da sala.');room=null;showMenu(true)}});
-    hostConn.on('error',function(){joinError('Não foi possível entrar na sala.')});
+    hostConn.on('close',function(){
+      if(room){toast('O anfitrião saiu da sala.');room=null;showMenu(true)}
+      else if(!finished&&onError)onError('A conexão com a sala foi encerrada.');
+    });
+    hostConn.on('error',function(){if(!finished&&onError)onError('Não foi possível entrar na sala.')});
   });
   peer.on('error',function(err){
-    clearTimeout(timer);
-    if(err&&err.type==='peer-unavailable')joinError('Código inválido ou anfitrião offline.');
-    else joinError('Erro de conexão multiplayer.');
+    if(err&&err.type==='peer-unavailable'){if(!finished&&onError)onError('Código inválido ou anfitrião offline.')}
+    else if(err&&err.type!=='peer-unavailable'){if(!finished&&onError)onError('Erro de conexão multiplayer.')}
   });
-  function onState(){
-    clearTimeout(timer);closeJoinModal();
-  }
-  window.__nerdRoomJoined=onState;
 }
+
 function handleGuestMessage(msg){
   if(!msg||typeof msg!=='object')return;
-  if(msg.type==='reject'){joinError(msg.reason||'Entrada recusada.');return}
+  if(msg.type==='reject'){if(pendingJoin&&pendingJoin.error)pendingJoin.error(msg.reason||'Entrada recusada.');else joinError(msg.reason||'Entrada recusada.');return}
   if(msg.type==='room_state'){
     room=msg.room;
-    if(window.__nerdRoomJoined){window.__nerdRoomJoined();window.__nerdRoomJoined=null}
+    if(pendingJoin&&pendingJoin.success)pendingJoin.success();pendingJoin=null;
     showLobby(location.hash!=='#sala-lobby');renderLobby();return;
   }
   if(msg.type==='piece_rejected'){toast('Essa peça acabou de ser escolhida por outro jogador.');return}
@@ -424,7 +680,8 @@ async function copyCode(){
 }
 function leaveRoom(){
   var wasHost=isHost;
-  destroyPeer();room=null;isHost=false;
+  if(wasHost)destroyDirectory();
+  destroyPeer();room=null;roomPassword='';isHost=false;
   if(wasHost)showSetup(true);else showMenu(true);
 }
 function startRoomGame(){
@@ -435,6 +692,7 @@ function startRoomGame(){
     toast('Este protótipo multiplayer inicia no mapa Cidade de Nerdora.');
     room.config.map=0;
   }
+  room.started=true;destroyDirectory();
   var packet={type:'start_game',room:clone(room),game:null};
   sendAll(packet);
   launchOnlineGame(true,null);
@@ -461,6 +719,7 @@ window.NerdRoom={
   mount:mount,
   handleHash:function(hash){
     if(hash==='#criar-sala'){showSetup(false);return true}
+    if(hash==='#multiplayer'){showBrowser(false,false);return true}
     if(hash==='#sala-lobby'&&room){showLobby(false);return true}
     if(hash==='#tabuleiro-online'){showOnlineBoard(false);return true}
     return false;
@@ -480,6 +739,7 @@ window.NerdRoom={
 window.addEventListener('load',function(){
   mount();
   if(location.hash==='#criar-sala')showSetup(false);
+  else if(location.hash==='#multiplayer')showBrowser(false,false);
   else if(!location.hash)showMenuControls();
 });
 })();
