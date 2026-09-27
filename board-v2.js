@@ -384,7 +384,9 @@ async function land(pi,dice,bot,dbl){
     game.pending=idx;game.bonusRoll=!!(dbl&&!p.jail);game.phase='decide';render();return;
   }
   if(s[1]==='tax'){pay(pi,s[2],null);finish(pi,bot,dbl);return}
-  if((s[1]==='event'||s[1]==='chest')&&game.c.events!==false){await card(s[1],pi,bot);finish(pi,bot,dbl);return}
+  if(s[1]==='chest'){await card('chest',pi,bot);finish(pi,bot,dbl);return}
+  if(s[1]==='event'&&game.c.events!==false){await card('event',pi,bot);finish(pi,bot,dbl);return}
+  if(s[1]==='event'&&game.c.events===false){log('Cartas de Evento estão desativadas nesta partida.');finish(pi,bot,dbl);return}
   if(s[1]==='goto'){jail(pi);finish(pi,bot,false);return}
   finish(pi,bot,dbl);
 }
@@ -493,9 +495,16 @@ function trade(){
 }
 
 async function card(kind,pi,bot){
-  var deck=kind==='event'?EVENT_CARDS:CHEST_CARDS,c=deck[Math.floor(Math.random()*deck.length)];log(game.p[pi].n+' recebeu a carta <b>'+c[0]+'</b>.');
+  var deck=kind==='event'?EVENT_CARDS:CHEST_CARDS,c=deck[Math.floor(Math.random()*deck.length)],p=game.p[pi];
+  var beforeMoney=p.m,beforeKey=p.key||0,beforePos=p.pos;
+  log(p.n+' '+(kind==='chest'?'abriu um Baú de Nerdora e recebeu':'recebeu a carta')+' <b>'+c[0]+'</b>.');
   if(!bot)await cardModal(c[0],c[1],kind);else await delay(800);
   await effect(c[2],pi);
+  var moneyDelta=p.m-beforeMoney,keyDelta=(p.key||0)-beforeKey;
+  if(moneyDelta>0)log('<b>Recompensa:</b> '+p.n+' recebeu '+cash(moneyDelta)+'.');
+  else if(moneyDelta<0)log('<b>Efeito:</b> '+p.n+' perdeu '+cash(Math.abs(moneyDelta))+'.');
+  if(keyDelta>0)log('<b>Recompensa:</b> '+p.n+' recebeu uma Chave do Calabouço.');
+  if(p.pos!==beforePos)log('<b>Efeito:</b> '+p.n+' foi movido para '+S[p.pos][0]+'.');
 }
 function cardModal(t,b,kind){
   return new Promise(function(ok){modal(t,'<div class="ng-card-flip '+(kind==='chest'?'chest':'')+'">'+(kind==='chest'?'🎁':'⭐')+'<br><b>'+b+'</b></div>',[['Continuar','purple',function(){closeModal();ok()}]])})
