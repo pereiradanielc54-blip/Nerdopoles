@@ -5,6 +5,7 @@ var BOARD='/assets/nerdopoles-board-01.png';
 var PIECE_NAMES=['Nyan','Chapéu Mágico','Baú Nerdora','Espada Arcana','Escudo Nerdora','Dirigível'];
 var FALLBACK=['🐱','🎩','🧰','⚔️','🛡️','🛸'];
 var COLORS=['#a94cff','#39b9ff','#ff5a62','#4edb83','#ffc93f','#ff62c7'];
+var SPACE_COLORS={brown:'#9b5b3c',lightblue:'#57c9ff',pink:'#ff6fcb',orange:'#ff9b3c',nyan:'#9f7cff',red:'#ff525f',yellow:'#ffd557',green:'#4fd985',darkblue:'#5975ff',rail:'#b89cff',util:'#55e7ff',event:'#b95cff',chest:'#43d89d',tax:'#ffbf5a',jail:'#ff6a6a',goto:'#ff4b5b',free:'#63d8ff',start:'#9d6cff'};
 
 var S=[
 ['Portal de Nerdora','start'],
@@ -123,7 +124,7 @@ function mount(){
     '<div id="ngSpaceDock" class="ng-float"><div id="ngSpace" class="ng-space"></div><div id="ngSpaceDesc" class="ng-space-desc"></div><div id="ngTip" class="ng-turn-tip"></div></div>'+
     '<div id="ngDeckDock"><button id="ngEvent" class="ng-deck"><span>⭐</span><b>EVENTOS</b><small>Cartas de Nerdora</small></button><button id="ngChest" class="ng-deck chest"><span>🎁</span><b>BAÚS</b><small>Tesouros e surpresas</small></button></div>'+
     '<div id="ngDiceDock" class="ng-float"><div class="ng-dice-line"><div id="ngD1" class="ng-die">1</div><div id="ngD2" class="ng-die">1</div></div><button id="ngRoll" class="ng-roll">🎲 ROLAR DADOS</button></div>'+
-    '<div id="ngActionBar"><button id="ngBuy" class="ng-btn gold">COMPRAR</button><button id="ngAuction" class="ng-btn">LEILOAR</button><button id="ngBuild" class="ng-btn">CONSTRUIR</button><button id="ngMortgage" class="ng-btn">HIPOTECAR</button><button id="ngTrade" class="ng-btn">NEGOCIAR</button><button id="ngEnd" class="ng-btn purple">ENCERRAR TURNO</button></div>'+
+    '<div id="ngActionBar"><button id="ngBuy" class="ng-btn gold"><span>◈</span> COMPRAR</button><button id="ngAuction" class="ng-btn"><span>⚒</span> LEILOAR</button><button id="ngBuild" class="ng-btn"><span>⌂</span> CONSTRUIR</button><button id="ngMortgage" class="ng-btn"><span>◇</span> HIPOTECAR</button><button id="ngTrade" class="ng-btn"><span>⇄</span> NEGOCIAR</button><button id="ngEnd" class="ng-btn purple"><span>✓</span> ENCERRAR TURNO</button></div>'+
     '<div id="ngLog" class="ng-float ng-log"></div>'+
   '</section>'+
   '<div id="ngModal"><div class="ng-modal-card"><div id="ngModalTitle" class="ng-modal-title"></div><div id="ngModalBody" class="ng-modal-body"></div><div id="ngModalActions" class="ng-modal-actions"></div></div></div>';
@@ -243,9 +244,17 @@ function renderOwners(){
 function renderPlayers(){
   var e=document.getElementById('ngPlayers');
   e.innerHTML=game.p.map(function(p,k){
-    return '<div class="ng-player '+(k===game.t?'active ':'')+(p.dead?'dead':'')+'"><span class="ng-player-color" style="--pc:'+p.c+'"></span><span>'+p.n+'</span><span class="ng-pmoney">'+cash(p.m)+'</span></div>';
+    var sprite=pieceSprites[p.piece]||'';
+    var piece=sprite?'<img src="'+sprite+'?v=105" alt="">':'<span>'+FALLBACK[p.piece]+'</span>';
+    var status=(p.jail?' <em class="ng-state jail">CALABOUÇO</em>':'')+(p.key?' <em class="ng-state key">🔑 '+p.key+'</em>':'');
+    return '<div class="ng-player '+(k===game.t?'active ':'')+(p.dead?'dead':'')+'" style="--pc:'+p.c+'">'+
+      '<span class="ng-player-piece">'+piece+'</span>'+
+      '<span class="ng-player-main"><b>'+p.n+'</b>'+status+'</span>'+
+      '<span class="ng-pmoney">'+cash(p.m)+'</span>'+
+    '</div>';
   }).join('');
 }
+
 function renderHud(){
   var p=game.p[game.t],sp=S[p.pos],me=game.p[0],human=game.t===0&&!me.dead,pending=game.pending!=null;
   document.getElementById('ngTurn').textContent=human?'Sua vez':'Vez de '+p.n;
@@ -257,6 +266,18 @@ function renderHud(){
   document.getElementById('ngSpace').textContent=sp[0];
   document.getElementById('ngSpaceDesc').innerHTML=desc(p.pos);
   document.getElementById('ngTip').textContent=tip(human,pending);
+
+  var hud=document.getElementById('ngHud');
+  var statusDock=document.getElementById('ngStatusDock');
+  var spaceDock=document.getElementById('ngSpaceDock');
+  var diceDock=document.getElementById('ngDiceDock');
+  var accent=SPACE_COLORS[sp[3]]||SPACE_COLORS[sp[1]]||'#a96cff';
+  hud.style.setProperty('--turn-color',p.c||'#a96cff');
+  spaceDock.style.setProperty('--space-accent',accent);
+  spaceDock.dataset.kind=sp[1];
+  statusDock.classList.toggle('human-turn',human);
+  statusDock.classList.toggle('bot-turn',!human);
+  diceDock.classList.toggle('ready',human&&game.phase==='roll'&&!moving);
 
   var canRoll=human&&game.phase==='roll'&&!moving;
   var canBuy=human&&game.phase==='decide'&&pending&&me.m>=S[game.pending][2];
@@ -281,7 +302,7 @@ function renderHud(){
     el.hidden=!show;el.disabled=!show;if(show)visibleCount++;
   });
   var end=document.getElementById('ngEnd');
-  end.textContent=game.phase==='decide'?'RECUSAR':'ENCERRAR TURNO';
+  end.innerHTML=game.phase==='decide'?'<span>×</span> RECUSAR':'<span>✓</span> ENCERRAR TURNO';
   actionBar.hidden=!human||visibleCount===0;
 }
 
