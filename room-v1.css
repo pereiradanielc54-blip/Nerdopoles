@@ -1,0 +1,90 @@
+
+#roomLayer{position:absolute;inset:0;z-index:45;display:none;pointer-events:none;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#roomLayer.on{display:block}
+.room-hot,.room-choice,.room-toggle,.room-arrow,.room-piece,.lobby-piece,.lobby-start,.room-copy{position:absolute;border:0;background:transparent;padding:0;margin:0;pointer-events:auto;cursor:pointer}
+.room-hot:focus-visible,.room-choice:focus-visible,.room-toggle:focus-visible,.room-arrow:focus-visible,.room-piece:focus-visible,.lobby-piece:focus-visible,.lobby-start:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#roomBack{left:1.05%;top:1.5%;width:11.2%;height:7.7%}
+
+/* Configuração da sala */
+#roomSetupUI{position:absolute;inset:0;display:none}
+#roomSetupUI.on{display:block}
+.room-count{top:29.4%;width:4.9%;height:6.8%;border-radius:9px}
+.room-count[data-v="2"]{left:4.15%}.room-count[data-v="3"]{left:10.35%}.room-count[data-v="4"]{left:16.45%}.room-count[data-v="5"]{left:22.45%}.room-count[data-v="6"]{left:28.4%}
+.room-count.selected{box-shadow:inset 0 0 0 3px #ffd24e,0 0 15px #ffb82a;background:rgba(255,180,34,.10)}
+.room-map{width:9.4%;height:9.7%;border-radius:10px}
+.room-map[data-i="0"]{left:3.55%;top:64.7%}.room-map[data-i="1"]{left:13.65%;top:64.7%}.room-map[data-i="2"]{left:24.05%;top:64.7%}
+.room-map[data-i="3"]{left:3.55%;top:75.6%}.room-map[data-i="4"]{left:13.65%;top:75.6%}.room-map[data-i="5"]{left:24.05%;top:75.6%}
+.room-map.selected{box-shadow:inset 0 0 0 3px #ffe16c,0 0 15px rgba(255,191,56,.8)}
+#roomMapPrev{left:3.25%;top:52.55%;width:3.25%;height:6.3%}
+#roomMapNext{left:31.8%;top:52.55%;width:3.25%;height:6.3%}
+#roomMapLabel{position:absolute;left:10.5%;top:59.9%;width:18.2%;height:4.1%;z-index:47;display:grid;place-items:center;color:#fff;font-weight:900;font-size:clamp(7px,.9vw,14px);pointer-events:none;text-shadow:0 2px 4px #000}
+
+.room-piece{width:9.9%;height:20.0%;border-radius:14px}
+.room-piece[data-i="0"]{left:37.3%;top:28.9%}.room-piece[data-i="1"]{left:47.9%;top:28.9%}.room-piece[data-i="2"]{left:58.3%;top:28.9%}
+.room-piece[data-i="3"]{left:37.3%;top:49.8%}.room-piece[data-i="4"]{left:47.9%;top:49.8%}.room-piece[data-i="5"]{left:58.3%;top:49.8%}
+.room-piece.selected{box-shadow:inset 0 0 0 3px #ff4cff,0 0 18px rgba(223,47,255,.85)}
+.room-piece.selected:after{content:"✓";position:absolute;right:6%;top:5%;width:19%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:#d700ff;color:#fff;font-weight:900;font-size:clamp(8px,1vw,14px)}
+#roomSelectedPiece{position:absolute;left:41.2%;top:75.4%;width:23.9%;height:10.3%;z-index:47;display:grid;place-items:center;text-align:center;color:#f2eaff;font-weight:900;font-size:clamp(8px,.95vw,14px);pointer-events:none}
+
+.room-arrow{width:2.0%;height:4.2%;border-radius:8px}
+#roomDurPrev,#roomMoneyPrev,#roomBuildPrev{left:86.25%}
+#roomDurNext,#roomMoneyNext,#roomBuildNext{left:95.35%}
+#roomDurPrev,#roomDurNext{top:28.4%}#roomMoneyPrev,#roomMoneyNext{top:35.3%}#roomBuildPrev,#roomBuildNext{top:42.1%}
+.room-setting-value{position:absolute;left:88.45%;width:6.65%;height:4.2%;z-index:47;display:grid;place-items:center;text-align:center;color:#fff;font-size:clamp(7px,.82vw,13px);font-weight:900;pointer-events:none}
+#roomDurValue{top:28.4%}#roomMoneyValue{top:35.3%}#roomBuildValue{top:42.1%}
+.room-setting-desc{position:absolute;left:75.55%;width:10.3%;z-index:47;color:#c9d1ff;font-size:clamp(5px,.58vw,8.8px);line-height:1.1;pointer-events:none}
+#roomDurDesc{top:31.3%}#roomMoneyDesc{top:38.2%}#roomBuildDesc{top:45.0%}
+
+.room-toggle{left:92.5%;width:4.2%;height:4.25%;border-radius:999px;z-index:48}
+.room-toggle:after{content:"";position:absolute;top:8%;left:8%;width:39%;height:84%;border-radius:50%;background:#e8edff;box-shadow:0 1px 5px #0008;transition:left .15s ease}
+.room-toggle.on{background:linear-gradient(90deg,#7600ff,#d100ff);box-shadow:0 0 12px rgba(189,0,255,.5)}
+.room-toggle.on:after{left:53%}
+#roomTrades{top:49.3%}#roomAuctions{top:56.1%}#roomEvents{top:63.0%}#roomPrivate{top:69.8%}
+#roomCreate{left:71.1%;top:76.4%;width:27.4%;height:15.5%;border-radius:18px}
+#roomCreate.ready{filter:drop-shadow(0 0 12px rgba(226,56,255,.55))}
+#roomToast{position:absolute;left:50%;bottom:2.5%;transform:translate(-50%,12px);z-index:70;padding:.5em .9em;border-radius:999px;background:rgba(9,10,33,.96);border:1px solid #b26cff;color:#fff;font-size:clamp(7px,.8vw,12px);font-weight:800;opacity:0;transition:.15s;pointer-events:none}
+#roomToast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Lobby */
+#roomLobbyUI{position:absolute;inset:0;display:none}
+#roomLobbyUI.on{display:block}
+.lobby-card{position:absolute;top:31.2%;width:14.5%;height:23.3%;z-index:48;border-radius:16px;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:2.5%;text-align:center}
+.lobby-card[data-slot="0"]{left:4.0%}.lobby-card[data-slot="1"]{left:19.65%}.lobby-card[data-slot="2"]{left:35.15%}.lobby-card[data-slot="3"]{left:50.65%}.lobby-card[data-slot="4"]{left:66.15%}.lobby-card[data-slot="5"]{left:81.7%}
+.lobby-card.locked{background:rgba(0,0,0,.68);box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)}
+.lobby-card.locked:after{content:"✕";font-size:clamp(34px,5vw,76px);font-weight:1000;color:#b9bfd4;text-shadow:0 4px 10px #000}
+.lobby-avatar{width:35%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;margin-bottom:4%;background:rgba(6,9,29,.82);border:2px solid var(--slot-color,#a96cff);box-shadow:0 0 12px color-mix(in srgb,var(--slot-color,#a96cff) 52%,transparent);overflow:hidden}
+.lobby-avatar img{width:120%;height:120%;object-fit:contain;object-position:center bottom}
+.lobby-name{max-width:88%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(7px,.85vw,13px);font-weight:900;color:#fff}
+.lobby-status{margin-top:2%;font-size:clamp(5px,.58vw,9px);color:#cbd1ff}
+.lobby-card.waiting .lobby-avatar:before{content:"…";font-size:clamp(18px,2.5vw,38px);font-weight:900;color:#8b93b4}
+
+.lobby-piece{top:59.1%;width:10.8%;height:18.5%;border-radius:13px;z-index:49}
+.lobby-piece[data-i="0"]{left:11.6%}.lobby-piece[data-i="1"]{left:24.1%}.lobby-piece[data-i="2"]{left:36.6%}.lobby-piece[data-i="3"]{left:49.2%}.lobby-piece[data-i="4"]{left:61.7%}.lobby-piece[data-i="5"]{left:74.4%}
+.lobby-piece.occupied{background:rgba(0,0,0,.64);box-shadow:inset 0 0 0 2px rgba(255,255,255,.08);cursor:not-allowed}
+.lobby-piece.occupied:after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:#d8dced;font-size:clamp(24px,3.4vw,52px);font-weight:1000;text-shadow:0 3px 8px #000}
+.lobby-piece.mine{box-shadow:inset 0 0 0 3px #ffe36d,0 0 18px rgba(255,220,73,.65)}
+#roomCode{position:absolute;left:18.0%;top:87.4%;width:24.6%;height:5.6%;z-index:49;display:flex;align-items:center;justify-content:center;gap:.24em;color:#fff;font-weight:1000;font-size:clamp(11px,1.5vw,22px);letter-spacing:.32em;pointer-events:none;text-shadow:0 2px 5px #000}
+#roomCopy{left:44.1%;top:86.8%;width:4.2%;height:6.8%;z-index:49}
+#roomLobbyInfo{position:absolute;left:49.7%;top:81.0%;width:31%;height:5%;z-index:49;display:grid;place-items:center;color:#dce1ff;font-size:clamp(6px,.7vw,11px);font-weight:800;pointer-events:none;text-shadow:0 2px 4px #000}
+#roomStart{left:55.3%;top:82.0%;width:32.2%;height:13.7%;z-index:49;border-radius:18px}
+#roomStart.disabled{filter:grayscale(.78) brightness(.48);cursor:not-allowed}
+#roomStart:not(.disabled){filter:drop-shadow(0 0 14px rgba(213,47,255,.58))}
+
+/* Modal para entrar em uma sala */
+#roomJoinModal{position:absolute;inset:0;z-index:100;display:none;place-items:center;background:rgba(5,5,18,.72);backdrop-filter:blur(4px);pointer-events:auto}
+#roomJoinModal.on{display:grid}
+.room-join-card{width:min(78%,430px);padding:24px;border-radius:20px;background:linear-gradient(180deg,#1b1547,#0a0d28);border:1px solid #9e6dff;box-shadow:0 22px 60px #000b}
+.room-join-title{font-size:20px;font-weight:950;color:#ffe178}
+.room-join-copy{margin:6px 0 16px;color:#d4d7ef;font-size:12px}
+.room-input{width:100%;padding:12px 13px;border-radius:10px;border:1px solid #64578f;background:#0e1231;color:#fff;font-weight:800;margin-bottom:10px;text-transform:uppercase;outline:none}
+.room-input:focus{border-color:#be6cff;box-shadow:0 0 0 3px rgba(190,108,255,.12)}
+.room-join-actions{display:flex;gap:10px}
+.room-modal-btn{flex:1;padding:11px;border-radius:10px;border:1px solid #7165ac;background:#211b57;color:#fff;font-weight:900;cursor:pointer}
+.room-modal-btn.primary{background:linear-gradient(#9731e9,#52099b);border-color:#d681ff}
+.room-modal-error{min-height:18px;margin-top:8px;color:#ff8f9f;font-size:11px;font-weight:800}
+
+@media(max-width:900px){
+  .lobby-card{padding-top:1.5%}
+  .lobby-status{display:none}
+  #roomSelectedPiece{font-size:8px}
+}
