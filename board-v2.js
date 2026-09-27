@@ -37,11 +37,25 @@ var CHEST_CARDS=[
 ['Taxa da Guilda','Pague 40 N de contribuição anual.','-40']
 ];
 
-var positions=[],i;
-for(i=0;i<=10;i++)positions.push([12+i*7.6,9.7]);
-for(i=11;i<=20;i++)positions.push([91.3,17+(i-11)*7.8]);
-for(i=21;i<=30;i++)positions.push([83.7-(i-21)*8.25,89.1]);
-for(i=31;i<=39;i++)positions.push([8.65,81.3-(i-31)*8.2]);
+var positions=[
+[13.2,17.8],[21.4,18.4],[27.5,18.4],[33.9,18.4],[40.2,18.4],[46.6,18.4],[53.0,18.4],[59.2,18.4],[65.3,18.4],[71.8,18.4],[87.1,17.8],
+[91.2,24.5],[91.6,30.8],[92.0,37.5],[92.2,44.3],[91.8,51.2],[92.0,58.4],[92.0,65.8],[91.8,71.9],[91.8,76.4],
+[94.2,91.2],
+[83.8,92.7],[77.5,92.7],[65.0,92.7],[59.2,92.7],[52.8,92.7],[46.8,92.7],[34.0,92.7],[27.8,92.7],[16.4,92.7],[6.0,91.0],
+[12.2,74.5],[12.2,69.5],[12.2,62.0],[12.4,54.6],[12.4,47.5],[12.4,40.0],[12.5,32.4],[12.5,25.3],[12.5,18.7]
+],i;
+
+var PLAYER_SLOTS={
+  top:[[-1.55,-.15],[0,-.15],[1.55,-.15],[-1.55,1.25],[0,1.25],[1.55,1.25]],
+  right:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]],
+  bottom:[[-1.55,-1.15],[0,-1.15],[1.55,-1.15],[-1.55,.55],[0,.55],[1.55,.55]],
+  left:[[-1.05,-1.55],[1.05,-1.55],[-1.05,0],[1.05,0],[-1.05,1.55],[1.05,1.55]]
+};
+function houseSide(idx){return idx<=10?'top':idx<=19?'right':idx<=30?'bottom':'left'}
+function playerBase(idx,playerId){
+  var base=positions[idx]||positions[0],slots=PLAYER_SLOTS[houseSide(idx)],o=slots[(Number(playerId)||0)%slots.length];
+  return [base[0]+o[0],base[1]+o[1]];
+}
 
 var game=null,root=null,logs=[],moving=false,pieceSprites=['/assets/tokens/token-0.png','/assets/tokens/token-1.png','/assets/tokens/token-2.png','/assets/tokens/token-3.png','/assets/tokens/token-4.png','/assets/tokens/token-5.png'];
 
@@ -145,16 +159,17 @@ function log(s){
 function render(){if(!game)return;renderTokens();renderOwners();renderPlayers();renderHud();save()}
 
 function renderTokens(){
-  if(!game)return;var e=document.getElementById('ngTokens');if(!e)return;e.innerHTML='';var count={};
+  if(!game)return;
+  var e=document.getElementById('ngTokens');if(!e)return;e.innerHTML='';
   game.p.forEach(function(p,k){
     if(p.dead)return;
-    var n=count[p.pos]||0;count[p.pos]=n+1;
-    var offsets=[[0,0],[15,-9],[-15,9],[16,10],[-16,-10],[0,17]],o=offsets[n%offsets.length];
-    var t=document.createElement('div');
+    var a=playerBase(p.pos,p.id),t=document.createElement('div');
     t.className='ng-token'+(k===0?' me':'');
-    t.style.left='calc('+positions[p.pos][0]+'% + '+o[0]+'px)';
-    t.style.top='calc('+positions[p.pos][1]+'% + '+o[1]+'px)';
+    t.style.left=a[0]+'%';
+    t.style.top=a[1]+'%';
     t.style.setProperty('--c',p.c||COLORS[k%COLORS.length]);
+    t.dataset.player=String(p.id);
+    t.dataset.space=String(p.pos);
 
     var fallback=document.createElement('span');
     fallback.className='fallback';
@@ -170,7 +185,7 @@ function renderTokens(){
     var src=pieceSprites[p.piece];
     if(src){
       var im=document.createElement('img');
-      im.src=src+'?v=102';
+      im.src=src+'?v=104';
       im.alt=PIECE_NAMES[p.piece]||'Peça Nerdópoles';
       im.decoding='async';
       im.onload=function(){fallback.style.opacity='0'};
