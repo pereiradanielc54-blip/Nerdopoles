@@ -1,4 +1,4 @@
 {
-  "version": "1.2.1-preview",
-  "build": "frame-relative-responsive-board"
+  "version": "1.2.2-preview",
+  "build": "exact-cell-rects-six-player-slots"
 }
