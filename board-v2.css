@@ -107,3 +107,197 @@
   #ngActionBar{left:37.8%;width:40%;top:68.5%}
   .ng-log{left:64.5%;width:13.4%;top:50.6%;max-height:16%}
 }
+
+
+/* ===== Polimento visual v1.0.6 ===== */
+#ngHud{--turn-color:#a96cff}
+.ng-float{
+  position:absolute;
+  background:
+    linear-gradient(180deg,rgba(30,23,73,.88),rgba(7,11,31,.84)),
+    radial-gradient(circle at 50% 0,rgba(172,85,255,.12),transparent 48%);
+  border:1px solid rgba(195,157,255,.48);
+  box-shadow:0 10px 24px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -10px 30px rgba(21,8,58,.12);
+  backdrop-filter:blur(6px) saturate(1.12);
+  -webkit-backdrop-filter:blur(6px) saturate(1.12);
+}
+.ng-float:before{
+  content:"";position:absolute;left:12%;right:12%;top:-1px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(246,213,255,.78),transparent);
+  pointer-events:none;
+}
+.ng-title{
+  display:flex;align-items:center;gap:6px;margin-bottom:5%;
+  color:#f1e8ff;text-shadow:0 1px 4px #0008;
+}
+#ngPlayerDock .ng-title:before{content:"✦";color:#d88bff;font-size:1.1em}
+#ngPlayerDock{border-color:rgba(184,130,255,.58)}
+#ngPlayers{display:grid;gap:5px}
+
+.ng-player{
+  grid-template-columns:auto minmax(0,1fr) auto;
+  min-height:34px;padding:4px 7px 4px 4px;margin:0;
+  background:linear-gradient(90deg,rgba(24,28,69,.92),rgba(15,17,48,.86));
+  border:1px solid rgba(255,255,255,.055);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.ng-player:before{
+  content:"";position:absolute;left:0;top:14%;bottom:14%;width:2px;border-radius:4px;background:var(--pc);box-shadow:0 0 8px var(--pc)
+}
+.ng-player{position:relative}
+.ng-player.active{
+  transform:translateX(2px);
+  border-color:var(--pc);
+  background:linear-gradient(90deg,color-mix(in srgb,var(--pc) 18%,rgba(25,28,67,.96)),rgba(17,18,50,.94));
+  box-shadow:0 0 12px color-mix(in srgb,var(--pc) 35%,transparent),inset 0 0 14px rgba(255,255,255,.025);
+}
+.ng-player-piece{
+  width:clamp(25px,2.1vw,34px);height:clamp(25px,2.1vw,34px);
+  border-radius:50%;display:grid;place-items:center;overflow:hidden;
+  background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.15),rgba(5,7,24,.64));
+  border:1px solid var(--pc);box-shadow:0 0 7px color-mix(in srgb,var(--pc) 55%,transparent);
+}
+.ng-player-piece img{width:122%;height:122%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 2px 2px #000b)}
+.ng-player-piece span{font-size:clamp(11px,1.15vw,17px)}
+.ng-player-main{min-width:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ng-player-main b{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ng-state{font-style:normal;font-size:.72em;padding:2px 4px;border-radius:999px;font-weight:900;letter-spacing:.02em}
+.ng-state.jail{background:#8f2738;color:#ffdbe1;border:1px solid #e5687a55}
+.ng-state.key{background:#68531c;color:#ffeaa4;border:1px solid #ffdb6255}
+.ng-pmoney{font-variant-numeric:tabular-nums;text-shadow:0 0 7px rgba(121,255,193,.2)}
+
+#ngStatusDock{
+  overflow:hidden;border-color:color-mix(in srgb,var(--turn-color) 70%,#ffffff22);
+  box-shadow:0 10px 26px #0007,inset 0 0 25px color-mix(in srgb,var(--turn-color) 8%,transparent);
+}
+#ngStatusDock:after{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--turn-color),transparent);
+  box-shadow:0 0 12px var(--turn-color);
+}
+#ngStatusDock.human-turn{animation:ngTurnPulse 2.2s ease-in-out infinite}
+#ngStatusDock.bot-turn{filter:saturate(.72)}
+@keyframes ngTurnPulse{
+  0%,100%{box-shadow:0 10px 26px #0007,inset 0 0 25px color-mix(in srgb,var(--turn-color) 7%,transparent)}
+  50%{box-shadow:0 10px 28px #0008,0 0 14px color-mix(in srgb,var(--turn-color) 22%,transparent),inset 0 0 25px color-mix(in srgb,var(--turn-color) 12%,transparent)}
+}
+.ng-turn:before{content:"◆";font-size:.75em;margin-right:5px;color:var(--turn-color);text-shadow:0 0 8px var(--turn-color)}
+.ng-cash{
+  padding:3px 7px;border-radius:999px;background:rgba(40,133,93,.14);
+  border:1px solid rgba(117,255,193,.16);font-variant-numeric:tabular-nums
+}
+
+#ngSpaceDock{
+  border-color:color-mix(in srgb,var(--space-accent,#a96cff) 58%,#ffffff22);
+  box-shadow:0 10px 24px #0007,inset 0 0 28px color-mix(in srgb,var(--space-accent,#a96cff) 7%,transparent);
+}
+#ngSpaceDock:after{
+  content:"";position:absolute;left:0;top:12%;bottom:12%;width:3px;border-radius:5px;
+  background:var(--space-accent,#a96cff);box-shadow:0 0 11px var(--space-accent,#a96cff)
+}
+.ng-space{padding-left:4px;text-shadow:0 2px 4px #0009}
+.ng-space-desc{padding-left:4px}
+.ng-turn-tip{
+  position:relative;overflow:hidden;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--space-accent,#a96cff) 18%,rgba(85,40,140,.3)),rgba(85,40,140,.16));
+  border-left-color:var(--space-accent,#b76cff);
+}
+.ng-turn-tip:after{
+  content:"";position:absolute;right:-16px;top:-18px;width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--space-accent,#a96cff) 18%,transparent),transparent 68%);
+}
+
+#ngDeckDock{perspective:800px}
+.ng-deck{
+  position:relative;overflow:visible;
+  box-shadow:0 10px 18px #0008,0 0 18px rgba(156,83,255,.13),inset 0 0 22px rgba(255,255,255,.045);
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
+}
+.ng-deck:before,.ng-deck:after{
+  content:"";position:absolute;inset:4px -4px -5px 4px;border-radius:14px;z-index:-1;
+  background:#2b1650;border:1px solid rgba(177,121,255,.28);box-shadow:0 4px 9px #0006
+}
+.ng-deck:after{inset:8px -8px -9px 8px;opacity:.6}
+.ng-deck.chest:before,.ng-deck.chest:after{background:#123d2a;border-color:rgba(91,225,170,.25)}
+.ng-deck:hover{filter:brightness(1.12);transform:translateY(-3px) rotate(-1deg)}
+.ng-deck:nth-child(2):hover{transform:translateY(-3px) rotate(1deg)}
+.ng-deck span{filter:drop-shadow(0 0 8px rgba(255,255,255,.18))}
+.ng-deck b{letter-spacing:.06em}
+.ng-deck small{letter-spacing:.02em}
+
+#ngDiceDock{
+  background:
+    radial-gradient(circle at 50% 35%,rgba(174,76,255,.16),transparent 45%),
+    linear-gradient(180deg,rgba(22,17,58,.88),rgba(8,11,32,.86));
+  border-color:rgba(210,158,255,.5);
+  overflow:hidden;
+}
+#ngDiceDock:before{
+  content:"";position:absolute;width:120%;height:50%;left:-10%;bottom:-28%;
+  background:radial-gradient(ellipse,rgba(166,72,255,.22),transparent 68%);pointer-events:none
+}
+#ngDiceDock.ready{
+  border-color:rgba(255,210,102,.72);
+  box-shadow:0 10px 28px #0008,0 0 18px rgba(200,88,255,.25),inset 0 0 24px rgba(172,73,255,.10);
+}
+#ngDiceDock.ready:after{
+  content:"";position:absolute;inset:4px;border-radius:10px;border:1px solid rgba(255,214,100,.12);
+  animation:ngRuneGlow 2s ease-in-out infinite;pointer-events:none
+}
+@keyframes ngRuneGlow{0%,100%{opacity:.25}50%{opacity:.85}}
+.ng-die{
+  border:1px solid rgba(255,255,255,.94);
+  box-shadow:0 7px 13px #000a,inset 0 0 0 2px rgba(255,255,255,.72),inset 0 -8px 18px rgba(88,70,145,.14)
+}
+.ng-roll{
+  position:relative;overflow:hidden;letter-spacing:.025em;
+  background:linear-gradient(180deg,#c448ff,#7113c5 55%,#4d098e);
+  box-shadow:0 0 16px rgba(190,71,255,.34),inset 0 1px 0 rgba(255,255,255,.22)
+}
+#ngDiceDock.ready .ng-roll{animation:ngRollReady 1.8s ease-in-out infinite}
+@keyframes ngRollReady{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+#ngActionBar{
+  padding:4px;border-radius:14px;
+  background:linear-gradient(180deg,rgba(19,14,52,.72),rgba(8,10,30,.62));
+  border:1px solid rgba(179,135,240,.2);
+  box-shadow:0 10px 24px #0006;backdrop-filter:blur(5px)
+}
+.ng-btn{
+  position:relative;overflow:hidden;min-height:34px;letter-spacing:.025em;
+  transition:transform .14s ease,filter .14s ease,box-shadow .14s ease;
+}
+.ng-btn span{font-size:1.15em;margin-right:3px;color:#d9c5ff}
+.ng-btn.gold span{color:#ffe18a}.ng-btn.purple span{color:#f0c9ff}
+.ng-btn:not(:disabled):hover{filter:brightness(1.13);transform:translateY(-1px);box-shadow:0 8px 16px #0008}
+.ng-btn:not(:disabled):active{transform:translateY(1px)}
+
+.ng-log{
+  background:linear-gradient(180deg,rgba(14,18,45,.76),rgba(8,11,28,.68));
+  border-color:rgba(129,113,190,.38);
+  scrollbar-width:thin;scrollbar-color:#7155a8 transparent
+}
+.ng-log:before{content:"HISTÓRICO";display:block;color:#a99bcf;font-size:.84em;font-weight:900;letter-spacing:.08em;margin-bottom:4px}
+.ng-log div:last-child{color:#fff}
+.ng-log b{color:#ffe471;text-shadow:0 0 5px rgba(255,224,113,.12)}
+
+#ngBack,#ngMap{
+  backdrop-filter:blur(5px);box-shadow:0 5px 13px #0007,inset 0 1px 0 rgba(255,255,255,.07)
+}
+#ngBack{transition:transform .14s ease,filter .14s ease}
+#ngBack:hover{transform:translateX(-2px);filter:brightness(1.12)}
+#ngMap{border-color:rgba(112,87,166,.55)}
+
+.ng-owner-flag{box-shadow:0 0 8px color-mix(in srgb,var(--c) 40%,transparent)}
+.ng-house-mini,.ng-hotel-mini{box-shadow:0 0 5px color-mix(in srgb,var(--owner) 48%,transparent)}
+.ng-token.me:after{
+  content:"";position:absolute;left:18%;right:18%;bottom:-4px;height:7px;border-radius:50%;
+  background:radial-gradient(ellipse,var(--c),transparent 68%);opacity:.5;z-index:0;filter:blur(1px)
+}
+
+@media(max-width:900px){
+  .ng-player-piece{width:23px;height:23px}
+  .ng-state{display:none}
+  #ngActionBar{padding:3px}
+  .ng-btn{min-height:30px}
+}
